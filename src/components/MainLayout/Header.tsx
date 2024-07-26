@@ -54,11 +54,10 @@ function HeaderMainLayout() {
 
 	return (
 		<nav
-			className={`w-full fixed z-50 flex items-center justify-between md:gap-8 duration-700 ${
-				isOnTop
+			className={`w-full fixed z-50 flex items-center justify-between md:gap-8 duration-700 ${isOnTop
 					? "bg-black bg-opacity-40 text-white"
 					: "bg-white bg-opacity-100 text-black"
-			} px-2`}
+				} px-2`}
 		>
 			<div className="px-1 py-2 md:flex-3 lg:flex-2 items-center justify-center md:justify-start flex flex-row">
 				<Link href="/">
@@ -105,6 +104,13 @@ function HeaderMainLayout() {
 						<div className="font-light text-xs px-2 py-1 hover:bg-blue-600 hover:text-white text-center whitespace-nowrap">
 							Buku Panduan
 						</div>
+					</a>
+					<a
+						href="https://drive.google.com/drive/folders/1gJFkJNaedDHJtldLqIabSeXkhgZ4gOEH?usp=sharing"
+						className="flex-1"
+					>
+						<div className="font-light text-xs px-2 py-1 hover:bg-blue-600 hover:text-white text-center whitespace-nowrap">
+							Aplikasi Mobile						</div>
 					</a>
 				</div>
 				{userData?.username ? (
@@ -182,6 +188,13 @@ function HeaderMainLayout() {
 							<div className="font-light text-xs px-2 py-1 hover:bg-blue-600 hover:text-white whitespace-nowrap">
 								Buku Panduan
 							</div>
+						</a>
+						<a
+							href="https://drive.google.com/drive/folders/1gJFkJNaedDHJtldLqIabSeXkhgZ4gOEH?usp=sharing"
+							className="flex-1"
+						>
+							<div className="font-light text-xs px-2 py-1 hover:bg-blue-600 hover:text-white text-center whitespace-nowrap">
+								Aplikasi Mobile						</div>
 						</a>
 					</div>
 					{userData?.username ? (
