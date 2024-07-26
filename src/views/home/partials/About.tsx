@@ -35,6 +35,7 @@ function About() {
 						src="/images/about_tisas.jpg"
 						width={800}
 						height={800}
+						unoptimized={true}
 					/>
 				</div>
 				<div className="w-full md:w-5/12 px-4 mr-auto ml-auto">
@@ -102,6 +103,7 @@ function About() {
 							src="/images/pengmas.jpg"
 							width={800}
 							height={800}
+							unoptimized={true}
 						/>
 					</div>
 				</div>

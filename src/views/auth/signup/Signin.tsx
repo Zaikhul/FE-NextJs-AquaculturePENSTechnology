@@ -91,6 +91,7 @@ function Signin() {
 					alt="Logo PENS"
 					width={60}
 					height={300}
+					unoptimized={true}
 				/>
 
 				<div className="mt-4">

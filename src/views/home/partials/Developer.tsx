@@ -21,6 +21,7 @@ function Developer() {
 								alt="Logo PENS"
 								width={800}
 								height={800}
+								unoptimized={true}
 							/>
 							<p className="text-center text-xs md:text-sm xl:text-base">
 								Dr.Eng Agus Indra Gunawan S.T., M.Sc
@@ -33,6 +34,7 @@ function Developer() {
 								alt="Logo PENS"
 								width={800}
 								height={800}
+								unoptimized={true}
 							/>
 							<p className="text-center text-xs md:text-sm xl:text-base">Dr. Setiawardhana S.T., M.T</p>
 						</div>
@@ -54,6 +56,7 @@ function Developer() {
 								alt="Logo PENS"
 								width={800}
 								height={800}
+								unoptimized={true}
 							/>
 							<p className="text-center text-xs md:text-sm xl:text-base">Ferry Ariyanto</p>
 						</div>
@@ -64,6 +67,7 @@ function Developer() {
 								alt="Logo PENS"
 								width={800}
 								height={800}
+								unoptimized={true}
 							/>
 							<p className="text-center text-xs md:text-sm xl:text-base">Torikul Huda</p>
 						</div>
@@ -74,6 +78,7 @@ function Developer() {
 								alt="Logo PENS"
 								width={800}
 								height={800}
+								unoptimized={true}
 							/>
 							<p className="text-center text-xs md:text-sm xl:text-base">Orlando Pratama Tambunan</p>
 						</div>
@@ -84,6 +89,7 @@ function Developer() {
 								alt="Logo PENS"
 								width={800}
 								height={800}
+								unoptimized={true}
 							/>
 							<p className="text-center text-xs md:text-sm xl:text-base">Muhammad Wafiq Kamaluddin</p>
 						</div>
@@ -94,6 +100,7 @@ function Developer() {
 								alt="Logo PENS"
 								width={800}
 								height={800}
+								unoptimized={true}
 							/>
 							<p className="text-center text-xs md:text-sm xl:text-base">Muhammad Aldino Habibullah</p>
 						</div>
@@ -104,6 +111,7 @@ function Developer() {
 								alt="Santi"
 								width={800}
 								height={800}
+								unoptimized={true}
 							/>
 							<p className="text-center text-xs md:text-sm xl:text-base">Santi</p>
 						</div>
@@ -114,6 +122,7 @@ function Developer() {
 								alt="Santi"
 								width={800}
 								height={800}
+								unoptimized={true}
 							/>
 							<p className="text-center text-xs md:text-sm xl:text-base">Ainul Mukhlasin</p>
 						</div>
@@ -124,6 +133,7 @@ function Developer() {
 								alt="Santi"
 								width={800}
 								height={800}
+								unoptimized={true}
 							/>
 							<p className="text-center text-xs md:text-sm xl:text-base">Ahmad Musafir Khoirul</p>
 						</div>
