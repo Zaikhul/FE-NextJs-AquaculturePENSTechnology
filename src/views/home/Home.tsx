@@ -57,11 +57,11 @@ function HomeViews() {
 					</div>
 				</div>
 			</div>
-			
+
 			<div id="content" className='flex flex-col items-center justify-center w-full'>
 				<About />
 				<Developer />
-				
+
 			</div>
 			<Sponsor />
 			<Footer />

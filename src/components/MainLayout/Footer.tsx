@@ -12,7 +12,7 @@ function FooterMainLayout() {
 					alt="Jumbotron PENS"
 					width={400}
 					height={400}
-          unoptimized={true}
+          			unoptimized={true}
 				/>
 			</div>
 			<div className="flex-2 flex justify-center flex-col text-xs">

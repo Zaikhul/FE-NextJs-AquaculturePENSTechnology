@@ -23,6 +23,7 @@ export default function Sponsor() {
                     className="shadow-lg rounded-full mx-auto"
                     width={150}
 					height={150}
+					unoptimized={true}
                   />
                   <div className="pt-6 text-center">
                     <h5 className="text-xl font-bold">

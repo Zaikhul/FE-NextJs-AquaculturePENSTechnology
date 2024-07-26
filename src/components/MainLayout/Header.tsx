@@ -68,6 +68,7 @@ function HeaderMainLayout() {
 							alt="Logo PENS"
 							width={40}
 							height={300}
+							unoptimized={true}
 						/>
 						<h1 className="font-bold text-xs">
 							PENS Aquaculture Technology
