@@ -20,7 +20,7 @@ const upperOxygenLimit = 10;
 const lowerSalinityLimit = 25;
 const upperSalinityLimit = 35;
 const lowerPHLimit = 6;
-const upperPHLimit = 8; 
+const upperPHLimit = 8;
 
 const columns: ColumnsType<RecordType> = [
 	{
@@ -95,7 +95,7 @@ const columns: ColumnsType<RecordType> = [
 			if (isBelowLimit) colorClass = "text-blue-500";
 			else if (isAboveLimit) colorClass = "text-red-500";
 
-			return <Space className={`text-center ${colorClass}`}>{salinity}%</Space>;
+			return <Space className={`text-center ${colorClass}`}>{salinity}ppt</Space>;
 		},
 	},
 	{

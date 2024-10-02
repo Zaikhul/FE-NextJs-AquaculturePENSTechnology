@@ -23,7 +23,7 @@ const AdminHeader = () => {
 				<Link href="/" className="flex flex-row items-center gap-4">
 					<Image
 						className="cursor-pointer"
-						src="/images/logo-aquaculture-pens.png"
+						src="/images/logo-aquaculture-pens.webp"
 						alt="Logo PENS"
 						width={40}
 						height={300}

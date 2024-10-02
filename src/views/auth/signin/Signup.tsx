@@ -73,7 +73,7 @@ function Signup() {
 			<div className="w-72 bg-gray-800 rounded mt-2 px-2 py-6">
 				<Image
 					className="cursor-pointer m-auto"
-					src="/images/logo-aquaculture-pens.png"
+					src="/images/logo-aquaculture-pens.webp"
 					alt="Logo PENS"
 					width={60}
 					height={300}

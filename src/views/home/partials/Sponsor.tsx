@@ -19,7 +19,7 @@ export default function Sponsor() {
                 <div className="px-3">
                   <Image
                     alt="logo pens"
-                    src="/images/sponsor/logopens.png"
+                    src="/images/sponsor/logopens.webp"
                     className="shadow-lg rounded-full mx-auto"
                     width={150}
 					height={150}
@@ -36,7 +36,7 @@ export default function Sponsor() {
                 <div className="px-3">
                   <Image
                     alt="logo aquaculture"
-                    src={'/images/logo-aquaculture-pens.png'}
+                    src={'/images/logo-aquaculture-pens.webp'}
                     className="shadow-lg rounded-full mx-auto"
                     width={150}
 					height={150}
@@ -56,7 +56,7 @@ export default function Sponsor() {
                   </div>
                   <Image
                     alt="Logo LPDP"
-                    src="/images/sponsor/lpdp.png"
+                    src="/images/sponsor/lpdp.webp"
                     className="shadow-lg rounded-full mx-auto"
                     width={150}
 					height={150}
@@ -76,7 +76,7 @@ export default function Sponsor() {
                   </div>
                   <Image
                     alt="Logo LPDP"
-                    src="/images/sponsor/mitrasdudi.png"
+                    src="/images/sponsor/mitrasdudi.webp"
                     className="shadow-lg rounded-full mx-auto"
                     width={150}
 					height={150}
@@ -93,7 +93,7 @@ export default function Sponsor() {
                 <div className="px-3">
                   <Image
                     alt="Logo Kemendikbud"
-                    src="/images/sponsor/kemendikbud.png"
+                    src="/images/sponsor/kemendikbud.webp"
                     className="shadow-lg rounded-full mx-auto"
                     width={150}
 				    height={150}

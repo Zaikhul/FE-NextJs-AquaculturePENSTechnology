@@ -17,7 +17,7 @@ function Developer() {
 						<div>
 							<Image
 								className="cursor-pointer rounded-full"
-								src="/images/pak_agus.png"
+								src="/images/pak_agus.webp"
 								alt="Logo PENS"
 								width={800}
 								height={800}
@@ -30,7 +30,7 @@ function Developer() {
 						<div>
 							<Image
 								className="cursor-pointer rounded-full"
-								src="/images/pak_set.png"
+								src="/images/pak_set.webp"
 								alt="Logo PENS"
 								width={800}
 								height={800}
@@ -52,7 +52,7 @@ function Developer() {
 						<div>
 							<Image
 								className="cursor-pointer rounded-full"
-								src="/images/feri.jpg"
+								src="/images/feri.webp"
 								alt="Logo PENS"
 								width={800}
 								height={800}
@@ -63,7 +63,7 @@ function Developer() {
 						<div>
 							<Image
 								className="cursor-pointer rounded-full"
-								src="/images/jon.jpg"
+								src="/images/jon.webp"
 								alt="Logo PENS"
 								width={800}
 								height={800}
@@ -74,7 +74,7 @@ function Developer() {
 						<div>
 							<Image
 								className="cursor-pointer rounded-full"
-								src="/images/aku_1x1.png"
+								src="/images/aku_1x1.webp"
 								alt="Logo PENS"
 								width={800}
 								height={800}
@@ -85,7 +85,7 @@ function Developer() {
 						<div>
 							<Image
 								className="cursor-pointer rounded-full"
-								src="/images/wafiq.png"
+								src="/images/wafiq.webp"
 								alt="Logo PENS"
 								width={800}
 								height={800}
@@ -96,7 +96,7 @@ function Developer() {
 						<div>
 							<Image
 								className="cursor-pointer rounded-full"
-								src="/images/aldino.jpg"
+								src="/images/aldino.webp"
 								alt="Logo PENS"
 								width={800}
 								height={800}
@@ -107,7 +107,7 @@ function Developer() {
 						<div>
 							<Image
 								className="cursor-pointer rounded-full"
-								src="/images/santi.jpg"
+								src="/images/santi.webp"
 								alt="Santi"
 								width={800}
 								height={800}
@@ -118,7 +118,7 @@ function Developer() {
 						<div>
 							<Image
 								className="cursor-pointer rounded-full"
-								src="/images/ainul.jpg"
+								src="/images/ainul.webp"
 								alt="Santi"
 								width={800}
 								height={800}
@@ -129,7 +129,7 @@ function Developer() {
 						<div>
 							<Image
 								className="cursor-pointer rounded-full"
-								src="/images/khoirul.jpg"
+								src="/images/khoirul.webp"
 								alt="Santi"
 								width={800}
 								height={800}

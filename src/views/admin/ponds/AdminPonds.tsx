@@ -77,7 +77,6 @@ function AdminPonds() {
 		}).then((res: any) => {
 			if (!res) return setPondsData([]);
 			setPondsData(res.data);
-			console.log(res);
 		});
 	};
 

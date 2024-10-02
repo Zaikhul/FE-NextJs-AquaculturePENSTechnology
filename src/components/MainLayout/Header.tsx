@@ -64,7 +64,7 @@ function HeaderMainLayout() {
 					<div className="flex flex-row items-center gap-4">
 						<Image
 							className="cursor-pointer"
-							src="/images/logo-aquaculture-pens.png"
+							src="/images/logo-aquaculture-pens.webp"
 							alt="Logo PENS"
 							width={40}
 							height={300}
@@ -107,7 +107,7 @@ function HeaderMainLayout() {
 						</div>
 					</a>
 					<a
-						href="https://drive.google.com/drive/folders/1gJFkJNaedDHJtldLqIabSeXkhgZ4gOEH?usp=sharing"
+						href="https://drive.google.com/file/d/1KzoGWIWOfHkY_2yqSjhOBsalZmeZujOr/view"
 						className="flex-1"
 					>
 						<div className="font-light text-xs px-2 py-1 hover:bg-blue-600 hover:text-white text-center whitespace-nowrap">
@@ -191,7 +191,7 @@ function HeaderMainLayout() {
 							</div>
 						</a>
 						<a
-							href="https://drive.google.com/drive/folders/1gJFkJNaedDHJtldLqIabSeXkhgZ4gOEH?usp=sharing"
+							href="https://drive.google.com/file/d/1KzoGWIWOfHkY_2yqSjhOBsalZmeZujOr/view"
 							className="flex-1"
 						>
 							<div className="font-light text-xs px-2 py-1 hover:bg-blue-600 hover:text-white text-center whitespace-nowrap">

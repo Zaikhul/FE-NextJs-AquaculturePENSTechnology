@@ -49,7 +49,6 @@ function AddNewPonds(props: IAddNewPonds) {
 	};
 
 	const handleChangeCity = (value: string, label: any) => {
-		console.log(value);
 		setSelectedCity(value);
 	};
 

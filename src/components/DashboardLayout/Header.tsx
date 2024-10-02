@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import cookiesHandler from "@/utils/storage/cookies";
+import { LogoutOutlined } from "@ant-design/icons";
 
 const DashboardHeader = () => {
 	const router = useRouter();
@@ -15,7 +17,12 @@ const DashboardHeader = () => {
 		return "";
 	};
 
-	useEffect(() => {}, []);
+	function logout() {
+		cookiesHandler.deleteCookie("access_token");
+		router.replace("/");
+	}
+
+	useEffect(() => { }, []);
 
 	return (
 		<div className="w-full">
@@ -23,7 +30,7 @@ const DashboardHeader = () => {
 				<Link href="/" className="flex flex-row items-center gap-4">
 					<Image
 						className="cursor-pointer"
-						src="/images/logo-aquaculture-pens.png"
+						src="/images/logo-aquaculture-pens.webp"
 						alt="Logo PENS"
 						width={40}
 						height={300}
@@ -60,6 +67,11 @@ const DashboardHeader = () => {
 						<p>Akun</p>
 					</Link>
 				</li>
+				<li><button onClick={logout} className="flex-1 border-b-2">
+					<div className="mt-6 rounded-lg px-2 py-1 bg-blue-600 text-white hover:bg-blue-400">
+						<LogoutOutlined />
+					</div>
+				</button></li>
 			</ul>
 		</div>
 	);

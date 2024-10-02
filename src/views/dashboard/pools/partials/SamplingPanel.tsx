@@ -170,7 +170,6 @@ function SamplingPanel(props: ISamplingPanel) {
 	const socketInit = () => {
 		const socket = socketIOClient("wss://dev-api-2023.aquaculturepens.com");
 		socket.on("Sample:" + props.poolId, async (data) => {
-			console.log(data);
 			getTodayMonitoring();
 		});
 	};

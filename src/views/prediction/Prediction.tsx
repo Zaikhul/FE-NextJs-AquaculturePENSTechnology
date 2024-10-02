@@ -26,7 +26,7 @@ const Prediction = () => {
 			var suhuValue = suhuElement.value;
 			var salinitasValue = salinitasElement.value;
 
-			console.log("oksigen", doOksigenElement?.value, "id kota", cityIdElement?.value, phValue, suhuValue, salinitasValue)
+			// console.log("oksigen", doOksigenElement?.value, "id kota", cityIdElement?.value, phValue, suhuValue, salinitasValue)
 
 
 			if (doOksigenValue != null && phValue != null && suhuValue != null && salinitasValue != null && cityIdValue != null) {
@@ -2580,8 +2580,6 @@ const Prediction = () => {
 					for (let i = 0; i < 405; i++) {
 						layer4[i] = layer3[i] * intro_layer4[i];
 					}
-
-					// console.log(layer4);
 
 					//layer5
 					layer5 = 0;

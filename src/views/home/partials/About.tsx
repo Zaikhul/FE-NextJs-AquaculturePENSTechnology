@@ -32,7 +32,7 @@ function About() {
 					<Image
 						alt="..."
 						className="max-w-full rounded-lg shadow-lg"
-						src="/images/about_tisas.jpg"
+						src="/images/about_tisas.webp"
 						width={800}
 						height={800}
 						unoptimized={true}
@@ -100,7 +100,7 @@ function About() {
 						<Image
 							alt="..."
 							className="max-w-full rounded-lg shadow-lg"
-							src="/images/pengmas.jpg"
+							src="/images/pengmas.webp"
 							width={800}
 							height={800}
 							unoptimized={true}

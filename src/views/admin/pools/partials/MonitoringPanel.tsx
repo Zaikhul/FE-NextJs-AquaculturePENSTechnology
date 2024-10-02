@@ -122,7 +122,6 @@ function MonitoringPanel(props: IMonitoringPanel) {
 			newestTime: "false",
 		}).then((res) => {
 			if (!res) return [];
-			console.log(res);
 			setRecords(res.data);
 			return res.data.map((datum: any, i: number) => {
 				const time =
@@ -173,7 +172,6 @@ function MonitoringPanel(props: IMonitoringPanel) {
 	const socketInit = () => {
 		const socket = socketIOClient("wss://dev-api-2023.aquaculturepens.com");
 		socket.on("Monitor:" + props.poolId, async (data) => {
-			console.log(data);
 			getTodayMonitoring();
 		});
 	};

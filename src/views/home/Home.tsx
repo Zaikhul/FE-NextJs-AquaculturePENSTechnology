@@ -16,7 +16,7 @@ function HomeViews() {
 			<div
 				className="w-full h-screen"
 				style={{
-					backgroundImage: `url('/images/jumbotron.jpg')`,
+					backgroundImage: `url('/images/jumbotron.webp')`,
 					backgroundRepeat: "no-repeat",
 					backgroundSize: "cover",
 					backgroundPosition: "center",
@@ -27,7 +27,7 @@ function HomeViews() {
 						<div>
 							<Image
 								className="contain relative w-16 h-16 md:w-44 md:h-44 rounded-full"
-								src="/images/logo-aquaculture-pens.png"
+								src="/images/logo-aquaculture-pens.webp"
 								alt="Jumbotron PENS"
 								width={720}
 								height={720}

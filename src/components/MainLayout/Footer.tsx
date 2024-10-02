@@ -8,7 +8,7 @@ function FooterMainLayout() {
 			<div className="flex-1 flex items-center">
 				<Image
 					className="contain relative w-full"
-					src="/images/pens-long-logo.png"
+					src="/images/pens-long-logo.webp"
 					alt="Jumbotron PENS"
 					width={400}
 					height={400}
