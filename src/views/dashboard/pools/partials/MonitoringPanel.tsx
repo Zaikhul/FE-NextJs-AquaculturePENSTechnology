@@ -1,4 +1,3 @@
-// frontend 
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Switch, DatePicker, Button } from "antd";
 import React, { useEffect, useState } from "react";
@@ -223,13 +222,11 @@ function MonitoringPanel(props: IMonitoringPanel) {
 							/>
 						</div>
 						<div className="space-y-2 md:space-x-2 mb-2">
-							<Link className="flex-1" href={"/dashboard/prediction/" + props.poolId}>
-							{/* Button Untuk Mengarahkan pada Halaman Prediksi WQI */}
-							{/* <Link className="flex-1" href={"aquarise.tech:5000/" + props.poolId}> */}
-								<button className="px-4 w-full py-2 bg-blue-600 text-white rounded-xl border-2 border-white">
-									Buka Prediksi
-								</button>
-							</Link>
+						<Link href={`/dashboard/prediction/${props.poolId}`}>
+						<button className="px-4 w-full py-2 bg-blue-600 text-white rounded-xl border-2 border-white">
+							Buka Prediksi
+						</button>
+						</Link>
 						</div>
 						<Button
 							className="bg-green-500 hover:bg-green-400 text-white px-4 rounded-lg"

@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Inter } from "@next/font/google";
+import { Inter } from "next/font/google";
 import MainLayout from "@/layouts/MainLayout";
 import HomeViews from "@/views/home/Home";
 import { useEffect } from "react";

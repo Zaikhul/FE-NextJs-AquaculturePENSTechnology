@@ -12,10 +12,10 @@ const serviceInstance = (isNotify: boolean, headless: boolean = false) => {
 
   const _serviceInstance = axios.create({
     baseURL: urlEndpoint,
-    timeout: 10000,
+    timeout: 30000,
     headers: {
       Authorization: "Bearer " + accessToken,
-      "Access-Control-Allow-Origin": "*",
+      // "Access-Control-Allow-Origin": "*",
     },
   });
 

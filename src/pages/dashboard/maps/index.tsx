@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Inter } from "@next/font/google";
+import { Inter } from "next/font/google";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import dynamic from "next/dynamic";
 

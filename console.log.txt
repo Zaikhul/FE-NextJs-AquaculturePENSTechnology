@@ -1,0 +1,285 @@
+websocket.js:50 [HMR] connected
+index.tsx:10 PredictionPage rendered with pool_id: undefined
+index.tsx:10 PredictionPage rendered with pool_id: undefined
+index.tsx:10 PredictionPage rendered with pool_id: 67036af8b9ba2cd62b293347
+index.tsx:10 PredictionPage rendered with pool_id: 67036af8b9ba2cd62b293347
+hook.js:608  Warning: React does not recognize the `fetchPriority` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `fetchpriority` instead. If you accidentally passed it from a parent component, remove it from the DOM element. Error Component Stack
+    at img (<anonymous>)
+    at eval (image-component.js:133:11)
+    at eval (image-component.js:241:46)
+    at a (<anonymous>)
+    at LinkComponent (link.js:108:19)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at DashboardHeader (Header.tsx:10:26)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at DashboardLayout (DashboardLayout.tsx:12:28)
+    at PredictionPage (index.tsx:7:27)
+    at Provider (Provider.js:7:3)
+    at MyApp (_app.tsx:9:33)
+    at PathnameContextProviderAdapter (adapters.js:84:11)
+    at ErrorBoundary (client.js:1:5389)
+    at ReactDevOverlay (client.js:1:7785)
+    at Container (index.js:79:1)
+    at AppContainer (index.js:209:11)
+    at Root (index.js:419:11)
+overrideMethod @ hook.js:608
+console.error @ client.js:1
+window.console.error @ setup-hydration-warning.js:18
+printWarning @ react-dom.development.js:86
+error @ react-dom.development.js:60
+validateProperty$1 @ react-dom.development.js:3757
+warnUnknownProperties @ react-dom.development.js:3803
+validateProperties$2 @ react-dom.development.js:3827
+validatePropertiesInDevelopment @ react-dom.development.js:9541
+setInitialProperties @ react-dom.development.js:9830
+finalizeInitialChildren @ react-dom.development.js:10950
+completeWork @ react-dom.development.js:22232
+completeUnitOfWork @ react-dom.development.js:26635
+performUnitOfWork @ react-dom.development.js:26607
+workLoopConcurrent @ react-dom.development.js:26582
+renderRootConcurrent @ react-dom.development.js:26544
+performConcurrentWorkOnRoot @ react-dom.development.js:25777
+workLoop @ scheduler.development.js:266
+flushWork @ scheduler.development.js:239
+performWorkUntilDeadline @ scheduler.development.js:533
+67036af8b9ba2cd62b293347:1 [Intervention] Images loaded lazily and replaced with placeholders. Load events are deferred. See https://go.microsoft.com/fwlink/?linkid=2048113
+manifest.json:1 
+            
+            
+            GET http://localhost:3000/manifest.json 404 (Not Found)
+67036af8b9ba2cd62b293347:1  Manifest fetch from http://localhost:3000/manifest.json failed, code 404
+index.tsx:391 Missing data for prediction enhancement: 0 predictions, 0 monitoring records
+index.tsx:315 Fetching historical predictions for pool 67036af8b9ba2cd62b293347
+index.tsx:391 Missing data for prediction enhancement: 0 predictions, 0 monitoring records
+index.tsx:315 Fetching historical predictions for pool 67036af8b9ba2cd62b293347
+hook.js:608  Image with src "http://localhost:3000/images/logo-aquaculture-pens.webp" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+overrideMethod @ hook.js:608
+warnOnce @ warn-once.js:16
+eval @ image-component.js:109
+Promise.then
+handleLoading @ image-component.js:38
+onLoad @ image-component.js:197
+callCallback @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+eval @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+index.tsx:391 Missing data for prediction enhancement: 0 predictions, 60 monitoring records
+index.tsx:540 Data points breakdown: {monitoring: 60, predictions: 2, pastPredictions: 0, futurePredictions: 2, actualValues: 0, …}
+index.tsx:754 Rendering chart with 0 past predictions (0 with comparison data) and 2 future predictions in combined mode
+index.tsx:540 Data points breakdown: {monitoring: 60, predictions: 2, pastPredictions: 0, futurePredictions: 2, actualValues: 0, …}
+index.tsx:754 Rendering chart with 0 past predictions (0 with comparison data) and 2 future predictions in combined mode
+hook.js:608  Warning: [antd: Card] `bordered` is deprecated. Please use `variant` instead. Error Component Stack
+    at eval (Card.js:53:18)
+    at div (<anonymous>)
+    at DashboardPrediction (index.tsx:32:68)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at DashboardLayout (DashboardLayout.tsx:12:28)
+    at PredictionPage (index.tsx:7:27)
+    at Provider (Provider.js:7:3)
+    at MyApp (_app.tsx:9:33)
+    at PathnameContextProviderAdapter (adapters.js:84:11)
+    at ErrorBoundary (client.js:1:5389)
+    at ReactDevOverlay (client.js:1:7785)
+    at Container (index.js:79:1)
+    at AppContainer (index.js:209:11)
+    at Root (index.js:419:11)
+overrideMethod @ hook.js:608
+console.error @ client.js:1
+window.console.error @ setup-hydration-warning.js:18
+warning @ warning.js:43
+call @ warning.js:64
+warningOnce @ warning.js:71
+warning @ warning.js:22
+typeWarning @ warning.js:55
+typeWarning.deprecated @ warning.js:60
+eval @ Card.js:90
+eval @ Card.js:88
+renderWithHooks @ react-dom.development.js:15486
+updateForwardRef @ react-dom.development.js:19245
+beginWork @ react-dom.development.js:21675
+beginWork$1 @ react-dom.development.js:27465
+performUnitOfWork @ react-dom.development.js:26596
+workLoopSync @ react-dom.development.js:26505
+renderRootSync @ react-dom.development.js:26473
+performConcurrentWorkOnRoot @ react-dom.development.js:25777
+workLoop @ scheduler.development.js:266
+flushWork @ scheduler.development.js:239
+performWorkUntilDeadline @ scheduler.development.js:533
+hook.js:608  Warning: [antd: Tabs] `Tabs.TabPane` is deprecated. Please use `items` instead. Error Component Stack
+    at Tabs (index.js:35:7)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at eval (Card.js:53:18)
+    at div (<anonymous>)
+    at DashboardPrediction (index.tsx:32:68)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at DashboardLayout (DashboardLayout.tsx:12:28)
+    at PredictionPage (index.tsx:7:27)
+    at Provider (Provider.js:7:3)
+    at MyApp (_app.tsx:9:33)
+    at PathnameContextProviderAdapter (adapters.js:84:11)
+    at ErrorBoundary (client.js:1:5389)
+    at ReactDevOverlay (client.js:1:7785)
+    at Container (index.js:79:1)
+    at AppContainer (index.js:209:11)
+    at Root (index.js:419:11)
+overrideMethod @ hook.js:608
+console.error @ client.js:1
+window.console.error @ setup-hydration-warning.js:18
+warning @ warning.js:43
+call @ warning.js:64
+warningOnce @ warning.js:71
+warning @ warning.js:22
+typeWarning @ warning.js:55
+typeWarning.deprecated @ warning.js:60
+useLegacyItems @ useLegacyItems.js:26
+Tabs @ index.js:89
+renderWithHooks @ react-dom.development.js:15486
+mountIndeterminateComponent @ react-dom.development.js:20103
+beginWork @ react-dom.development.js:21626
+beginWork$1 @ react-dom.development.js:27465
+performUnitOfWork @ react-dom.development.js:26596
+workLoopSync @ react-dom.development.js:26505
+renderRootSync @ react-dom.development.js:26473
+performConcurrentWorkOnRoot @ react-dom.development.js:25777
+workLoop @ scheduler.development.js:266
+flushWork @ scheduler.development.js:239
+performWorkUntilDeadline @ scheduler.development.js:533
+CardPrediction.tsx:356 Rendering temperature chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for temperature with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering oxygen chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for oxygen with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering salinity chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for salinity with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering pH chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for pH with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering temperature chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for temperature with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering oxygen chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for oxygen with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering salinity chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for salinity with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering pH chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for pH with values: (2) [{…}, {…}]
+index.tsx:540 Data points breakdown: {monitoring: 60, predictions: 2, pastPredictions: 0, futurePredictions: 2, actualValues: 0, …}
+index.tsx:754 Rendering chart with 0 past predictions (0 with comparison data) and 2 future predictions in combined mode
+index.tsx:540 Data points breakdown: {monitoring: 60, predictions: 2, pastPredictions: 0, futurePredictions: 2, actualValues: 0, …}
+index.tsx:754 Rendering chart with 0 past predictions (0 with comparison data) and 2 future predictions in combined mode
+CardPrediction.tsx:356 Rendering temperature chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for temperature with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering oxygen chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for oxygen with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering salinity chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for salinity with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering pH chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for pH with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering temperature chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for temperature with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering oxygen chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for oxygen with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering salinity chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for salinity with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering pH chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for pH with values: (2) [{…}, {…}]
+index.tsx:334 Retrieved 50 historical predictions
+index.tsx:352 Found 0 past predictions out of 50 total
+index.tsx:540 Data points breakdown: {monitoring: 60, predictions: 2, pastPredictions: 0, futurePredictions: 2, actualValues: 0, …}
+index.tsx:754 Rendering chart with 0 past predictions (0 with comparison data) and 2 future predictions in combined mode
+index.tsx:540 Data points breakdown: {monitoring: 60, predictions: 2, pastPredictions: 0, futurePredictions: 2, actualValues: 0, …}
+index.tsx:754 Rendering chart with 0 past predictions (0 with comparison data) and 2 future predictions in combined mode
+CardPrediction.tsx:356 Rendering temperature chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for temperature with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering oxygen chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for oxygen with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering salinity chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for salinity with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering pH chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for pH with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering temperature chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for temperature with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering oxygen chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for oxygen with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering salinity chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for salinity with values: (2) [{…}, {…}]
+CardPrediction.tsx:356 Rendering pH chart: {totalPoints: 62, pastPredictions: 0, futurePredictions: 2, withComparison: 0}
+CardPrediction.tsx:402 Rendering 2 predictions for pH with values: (2) [{…}, {…}]
+index.tsx:364 Processing 50 historical predictions and 60 monitoring records
+index.tsx:368 Monitoring data timespan: 2025-05-11T22:45:35.462Z to 2025-05-12T12:17:47.357Z
+index.tsx:377 Prediction creation timespan: 2025-05-12T19:45:56.074Z to 2025-05-12T21:43:08.641Z
+index.tsx:188 Processing 50 predictions against 60 monitoring records
+index.tsx:193 Current time reference: 2025-05-12T22:38:32.528Z
+index.tsx:215 Prediction 68226b6c950035bd4936d461 target time: 2025-05-13T03:43:08.641Z (FUTURE)
+index.tsx:215 Prediction 68226b6c950035bd4936d460 target time: 2025-05-13T03:43:08.404Z (FUTURE)
+index.tsx:215 Prediction 68226aa5950035bd4936d45e target time: 2025-05-13T03:39:49.940Z (FUTURE)
+index.tsx:215 Prediction 68226aa5bfa6ff19eb36d45e target time: 2025-05-13T03:39:49.913Z (FUTURE)
+index.tsx:215 Prediction 682269b7950035bd4936d45c target time: 2025-05-13T03:35:51.782Z (FUTURE)
+index.tsx:215 Prediction 682269b7bfa6ff19eb36d45c target time: 2025-05-13T03:35:51.689Z (FUTURE)
+index.tsx:215 Prediction 6822696a3952bf6c56df3dcd target time: 2025-05-13T03:34:34.372Z (FUTURE)
+index.tsx:215 Prediction 6822696a78279dca28df3dbf target time: 2025-05-13T03:34:34.360Z (FUTURE)
+index.tsx:215 Prediction 6822688e3952bf6c56df3dcb target time: 2025-05-13T03:30:54.111Z (FUTURE)
+index.tsx:215 Prediction 6822683d78279dca28df3dbd target time: 2025-05-13T03:29:33.968Z (FUTURE)
+index.tsx:215 Prediction 6822680b3952bf6c56df3dc9 target time: 2025-05-13T03:28:43.363Z (FUTURE)
+index.tsx:215 Prediction 682268013952bf6c56df3dc7 target time: 2025-05-13T03:28:33.081Z (FUTURE)
+index.tsx:215 Prediction 682267083952bf6c56df3dc5 target time: 2025-05-13T03:24:24.952Z (FUTURE)
+index.tsx:215 Prediction 682265dc3952bf6c56df3dc3 target time: 2025-05-13T03:19:24.967Z (FUTURE)
+index.tsx:215 Prediction 682265853952bf6c56df3dc1 target time: 2025-05-13T03:17:57.005Z (FUTURE)
+index.tsx:215 Prediction 682264583952bf6c56df3dbf target time: 2025-05-13T03:12:56.915Z (FUTURE)
+index.tsx:215 Prediction 6822632c3952bf6c56df3dbd target time: 2025-05-13T03:07:56.827Z (FUTURE)
+index.tsx:215 Prediction 68225d63925a668c2e85cad9 target time: 2025-05-13T02:43:15.736Z (FUTURE)
+index.tsx:215 Prediction 68225c376e33c2c25b85caf7 target time: 2025-05-13T02:38:15.762Z (FUTURE)
+index.tsx:215 Prediction 68225b0b6e33c2c25b85caf5 target time: 2025-05-13T02:33:15.822Z (FUTURE)
+index.tsx:215 Prediction 682259df925a668c2e85cad7 target time: 2025-05-13T02:28:15.880Z (FUTURE)
+index.tsx:215 Prediction 682258b36e33c2c25b85caf3 target time: 2025-05-13T02:23:15.760Z (FUTURE)
+index.tsx:215 Prediction 68225787925a668c2e85cad5 target time: 2025-05-13T02:18:15.772Z (FUTURE)
+index.tsx:215 Prediction 6822565b6e33c2c25b85caf1 target time: 2025-05-13T02:13:15.762Z (FUTURE)
+index.tsx:215 Prediction 6822552f6e33c2c25b85caef target time: 2025-05-13T02:08:15.800Z (FUTURE)
+index.tsx:215 Prediction 68225403925a668c2e85cad3 target time: 2025-05-13T02:03:15.906Z (FUTURE)
+index.tsx:215 Prediction 682252d76e33c2c25b85caed target time: 2025-05-13T01:58:15.701Z (FUTURE)
+index.tsx:215 Prediction 682252b66e33c2c25b85caeb target time: 2025-05-13T01:57:42.320Z (FUTURE)
+index.tsx:215 Prediction 682251896e33c2c25b85cae9 target time: 2025-05-13T01:52:41.833Z (FUTURE)
+index.tsx:215 Prediction 6822515e6e33c2c25b85cae7 target time: 2025-05-13T01:51:58.426Z (FUTURE)
+index.tsx:215 Prediction 682250b16e33c2c25b85cae5 target time: 2025-05-13T01:49:05.667Z (FUTURE)
+index.tsx:215 Prediction 6822505d925a668c2e85cad1 target time: 2025-05-13T01:47:41.838Z (FUTURE)
+index.tsx:215 Prediction 6822505d6e33c2c25b85cae3 target time: 2025-05-13T01:47:41.440Z (FUTURE)
+index.tsx:215 Prediction 68225045925a668c2e85cacf target time: 2025-05-13T01:47:17.770Z (FUTURE)
+index.tsx:215 Prediction 682250456e33c2c25b85cae1 target time: 2025-05-13T01:47:17.736Z (FUTURE)
+index.tsx:215 Prediction 68225029925a668c2e85cacd target time: 2025-05-13T01:46:49.938Z (FUTURE)
+index.tsx:215 Prediction 68225027925a668c2e85cacb target time: 2025-05-13T01:46:47.006Z (FUTURE)
+index.tsx:215 Prediction 6822501ed8bab4c61a85caaf target time: 2025-05-13T01:46:38.349Z (FUTURE)
+index.tsx:215 Prediction 6822501c6e33c2c25b85cadf target time: 2025-05-13T01:46:36.218Z (FUTURE)
+index.tsx:215 Prediction 682250176e33c2c25b85cadd target time: 2025-05-13T01:46:31.295Z (FUTURE)
+index.tsx:215 Prediction 682250126e33c2c25b85cadb target time: 2025-05-13T01:46:26.959Z (FUTURE)
+index.tsx:215 Prediction 682250106e33c2c25b85cad9 target time: 2025-05-13T01:46:24.153Z (FUTURE)
+index.tsx:215 Prediction 68225009925a668c2e85cac9 target time: 2025-05-13T01:46:17.112Z (FUTURE)
+index.tsx:215 Prediction 68225006925a668c2e85cac7 target time: 2025-05-13T01:46:14.773Z (FUTURE)
+index.tsx:215 Prediction 68225004925a668c2e85cac5 target time: 2025-05-13T01:46:12.961Z (FUTURE)
+index.tsx:215 Prediction 68225002925a668c2e85cac3 target time: 2025-05-13T01:46:10.100Z (FUTURE)
+index.tsx:215 Prediction 682250016e33c2c25b85cad7 target time: 2025-05-13T01:46:09.953Z (FUTURE)
+index.tsx:215 Prediction 68224ffd6e33c2c25b85cad5 target time: 2025-05-13T01:46:05.969Z (FUTURE)
+index.tsx:215 Prediction 68224ffbceb8fb894485caaf target time: 2025-05-13T01:46:03.160Z (FUTURE)
+index.tsx:215 Prediction 68224ff400ff8c082b85caaf target time: 2025-05-13T01:45:56.074Z (FUTURE)
+index.tsx:96 Filtering 50 predictions for time proximity
+index.tsx:170 Filtering results: 1/50 predictions kept
+index.tsx:171 Prediction types: 0 past (0 with comparison data), 50 future
+index.tsx:384 Enhanced predictions: {total: 1, completed: 0, withComparison: 0, future: 1}
+index.tsx:474 Processing 1 enhanced predictions for visualization
+index.tsx:480 Found 0 completed predictions with comparison data
+index.tsx:540 Data points breakdown: {monitoring: 60, predictions: 2, pastPredictions: 0, futurePredictions: 2, actualValues: 0, …}
+index.tsx:754 Rendering chart with 0 past predictions (0 with comparison data) and 2 future predictions in combined mode
+index.tsx:474 Processing 1 enhanced predictions for visualization
+index.tsx:480 Found 0 completed predictions with comparison data
