@@ -15,12 +15,10 @@ import {
   MonitoringRecord,
   PredictionRecord,
   CompletePredictionRecord,
-  PredictionComparison,
   DashboardPredictionProps,
   ChartViewMode,
   TimeRange,
   DataPoint,
-  ParameterStatus
 } from '@/interfaces/prediction';
 
 const { TabPane } = Tabs;
@@ -46,228 +44,175 @@ const DashboardPrediction: React.FC<DashboardPredictionProps> = ({ poolId }) => 
    * Format local time for display
    */
   const formatLocalTime = useCallback((date: Date | string): string => {
-	try {
-		const dateObj = typeof date === 'string' ? new Date(date) : date;
-		if (isNaN(dateObj.getTime())) throw new Error('Invalid date');
-		return dateObj.toLocaleString('id-ID', {
-		timeZone: 'Asia/Jakarta'
-		});
-	} catch (error) {
-		console.error('Date formatting error:', error);
-		return 'Invalid Date';
-	}
+    try {
+      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      if (isNaN(dateObj.getTime())) throw new Error('Invalid date');
+      return dateObj.toLocaleString('id-ID', {
+        timeZone: 'Asia/Jakarta'
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return 'Invalid Date';
+    }
   }, []);
 
   /**
-   * Calculate percentage error between predicted and actual value
-   */
-  const calculatePercentageError = useCallback((predicted: number, actual: number): number => {
-    if (actual === 0) return predicted === 0 ? 0 : 100;
-    return Math.abs((predicted - actual) / actual) * 100;
-  }, []);
-
-  /**
-   * Calculate accuracy metrics between predicted and actual values
-   */
-  const calculateAccuracy = useCallback((
-    predicted: WaterQualityData,
-    actual: MonitoringRecord
-  ): Record<string, number> => {
-    return {
-      temperature: calculatePercentageError(predicted.temperature, actual.temperature),
-      oxygen: calculatePercentageError(predicted.oxygen, actual.oxygen),
-      salinity: calculatePercentageError(predicted.salinity, actual.salinity),
-      acidity: calculatePercentageError(predicted.acidity, actual.acidity),
-      averageError: (
-        calculatePercentageError(predicted.temperature, actual.temperature) +
-        calculatePercentageError(predicted.oxygen, actual.oxygen) +
-        calculatePercentageError(predicted.salinity, actual.salinity) +
-        calculatePercentageError(predicted.acidity, actual.acidity)
-      ) / 4
-    };
-  }, [calculatePercentageError]);
-
-    /**
    * Filter predictions to avoid showing those too close in time
    */
-	const filterTimeProximity = useCallback((
-	predictions: CompletePredictionRecord[]
-	): CompletePredictionRecord[] => {
-		console.log(`Filtering ${predictions.length} predictions for time proximity`);
+  const filterTimeProximity = useCallback((
+    predictions: CompletePredictionRecord[]
+  ): CompletePredictionRecord[] => {
+    console.log(`Filtering ${predictions.length} predictions for time proximity`);
 
-	if (predictions.length <= 5) {
-		console.log("Not enough predictions to filter - keeping all", predictions.length);
-		return predictions;
-	}
+    if (predictions.length <= 5) {
+      console.log("Not enough predictions to filter - keeping all", predictions.length);
+      return predictions;
+    }
 
-	const sorted = [...predictions].sort((a, b) => {
-		const getTargetTime = (pred: CompletePredictionRecord): number => {
-		if (pred.predictionTimes?.targetTime) {
-			return new Date(pred.predictionTimes.targetTime).getTime();
-		}
-		return new Date(pred.predictionTime || Date.now()).getTime() +
-			((pred.predictionHorizon || 6) * 60 * 60 * 1000);
-		};
+    const sorted = [...predictions].sort((a, b) => {
+      const getTargetTime = (pred: CompletePredictionRecord): number => {
+        if (pred.predictionTimes?.targetTime) {
+          return new Date(pred.predictionTimes.targetTime).getTime();
+        }
+        // FIXED: Used nullish coalescing
+        return new Date(pred.predictionTime ?? Date.now()).getTime() +
+          ((pred.predictionHorizon ?? 6) * 60 * 60 * 1000);
+      };
 
-		return getTargetTime(a) - getTargetTime(b);
-	});
+      return getTargetTime(a) - getTargetTime(b);
+    });
 
     // Minimum time difference (2 hours)
-	const minTimeDiffMs = 2 * 60 * 60 * 1000;
-	const filtered: CompletePredictionRecord[] = [];
+    const minTimeDiffMs = 2 * 60 * 60 * 1000;
+    const filtered: CompletePredictionRecord[] = [];
 
-	let pastPredictions = 0;
-	let pastPredictionsWithComparison = 0;
-	let futurePredictions = 0;
+    let pastPredictions = 0;
+    let pastPredictionsWithComparison = 0;
+    let futurePredictions = 0;
 
-	sorted.forEach((prediction, index) => {
-		if (prediction.completed) {
-			pastPredictions++;
-			if (prediction.comparison) pastPredictionsWithComparison++;
-		} else {
-			futurePredictions++;
-		}
-
-		if (index === 0) {
-			filtered.push(prediction);
-			return;
-		}
-
-		const prevPredItem = filtered[filtered.length - 1];
-
-		let prevPredTime: number;
-		let currPredTime: number;
-
-		try {
-			if (prevPredItem.predictionTimes?.targetTime) {
-				prevPredTime = new Date(prevPredItem.predictionTimes.targetTime).getTime();
-			} else {
-				prevPredTime = new Date(prevPredItem.predictionTime || Date.now()).getTime() +
-					((prevPredItem.predictionHorizon || 6) * 60 * 60 * 1000);
-			}
-
-			if (prediction.predictionTimes?.targetTime) {
-				currPredTime = new Date(prediction.predictionTimes.targetTime).getTime();
-			} else {
-				currPredTime = new Date(prediction.predictionTime || Date.now()).getTime() +
-					((prediction.predictionHorizon || 6) * 60 * 60 * 1000);
-			}
-
-			if (prediction.completed && prediction.comparison) {
-				filtered.push(prediction);
-				return;
-			}
-
-			if (Math.abs(currPredTime - prevPredTime) >= minTimeDiffMs) {
-			filtered.push(prediction);
-			}
-		} catch (error) {
-			console.error("Error in time proximity filtering:", error);
-			filtered.push(prediction);
-		}
-		});
-
-  console.log(`Filtering results: ${filtered.length}/${sorted.length} predictions kept`);
-  console.log(`Prediction types: ${pastPredictions} past (${pastPredictionsWithComparison} with comparison data), ${futurePredictions} future`);
-
-  return filtered;
-}, []);
-
-  /**
-   * ientification of past predictions with actual measurement comparison
-   */
-const CompletedPredictions = useCallback((
-  predictions: PredictionRecord[],
-  monitoringData: MonitoringRecord[]
-): CompletePredictionRecord[] => {
-  if (!predictions.length || !monitoringData.length) {
-    console.log(`Missing data for prediction enhancement: ${predictions.length} predictions, ${monitoringData.length} monitoring records`);
-    return [];
-  }
-
-  console.log(`Processing ${predictions.length} predictions against ${monitoringData.length} monitoring records`);
-
-  const currentTime = new Date().getTime();
-  const completePredictions: CompletePredictionRecord[] = [];
-
-  console.log("Current time reference:", new Date(currentTime).toISOString());
-
-  const sortedMonitoring = [...monitoringData].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-  );
-
-  const matchingWindowMs = 3 * 60 * 60 * 1000;
-
-  predictions.forEach(prediction => {
-    try {
-
-      let targetTimestamp: number;
-      if (prediction.predictionTimes?.targetTime) {
-        targetTimestamp = new Date(prediction.predictionTimes.targetTime).getTime();
-      } else if (prediction.predictionTime) {
-        const horizonHours = prediction.predictionHorizon || 6;
-        targetTimestamp = new Date(prediction.predictionTime).getTime() + (horizonHours * 60 * 60 * 1000);
+    sorted.forEach((prediction, index) => {
+      if (prediction.completed) {
+        pastPredictions++;
+        if (prediction.comparison) pastPredictionsWithComparison++;
       } else {
-        console.warn(`Prediction ${prediction._id} has no valid time reference`);
+        futurePredictions++;
+      }
+
+      if (index === 0) {
+        filtered.push(prediction);
         return;
       }
 
-      console.log(`Prediction ${prediction._id} target time:`, new Date(targetTimestamp).toISOString(),
-                 `(${targetTimestamp < currentTime ? 'PAST' : 'FUTURE'})`);
+      const prevPredItem = filtered[filtered.length - 1];
 
-      const isPast = targetTimestamp < currentTime;
+      let prevPredTime: number;
+      let currPredTime: number;
 
-	if (isPast) {
-	const closestMonitoring = sortedMonitoring.reduce<MonitoringRecord | null>((closest, current) => {
-		const currentTimeDiff = Math.abs(new Date(current.createdAt).getTime() - targetTimestamp);
-		const closestTimeDiff = closest ? Math.abs(new Date(closest.createdAt).getTime() - targetTimestamp) : Infinity;
-		return currentTimeDiff < closestTimeDiff && currentTimeDiff <= matchingWindowMs ? current : closest;
-	}, null);
-
-        if (closestMonitoring) {
-          // Calculate comparison data
-          const comparisonData: PredictionComparison = {
-            predictionId: prediction._id,
-            targetTime: targetTimestamp,
-            monitoringTime: new Date(closestMonitoring.createdAt).getTime(),
-            timeDiff: Math.abs(new Date(closestMonitoring.createdAt).getTime() - targetTimestamp),
-            predictedValues: prediction.predictions,
-            actualValues: {
-              temperature: closestMonitoring.temperature,
-              oxygen: closestMonitoring.oxygen,
-              salinity: closestMonitoring.salinity,
-              acidity: closestMonitoring.acidity
-            },
-            accuracy: calculateAccuracy(prediction.predictions, closestMonitoring)
-          };
-
-          completePredictions.push({
-            ...prediction,
-            completed: true,
-            comparison: comparisonData
-          });
+      try {
+        if (prevPredItem.predictionTimes?.targetTime) {
+          prevPredTime = new Date(prevPredItem.predictionTimes.targetTime).getTime();
         } else {
+          // FIXED: Used nullish coalescing
+          prevPredTime = new Date(prevPredItem.predictionTime ?? Date.now()).getTime() +
+            ((prevPredItem.predictionHorizon ?? 6) * 60 * 60 * 1000);
+        }
+
+        if (prediction.predictionTimes?.targetTime) {
+          currPredTime = new Date(prediction.predictionTimes.targetTime).getTime();
+        } else {
+          // FIXED: Used nullish coalescing
+          currPredTime = new Date(prediction.predictionTime ?? Date.now()).getTime() +
+            ((prediction.predictionHorizon ?? 6) * 60 * 60 * 1000);
+        }
+
+        if (prediction.completed && prediction.comparison) {
+          filtered.push(prediction);
+          return;
+        }
+
+        if (Math.abs(currPredTime - prevPredTime) >= minTimeDiffMs) {
+          filtered.push(prediction);
+        }
+      } catch (error) {
+        // FIXED: Proper error handling
+        console.error("Error in time proximity filtering:", error);
+        // Still add the prediction despite the error to avoid data loss
+        filtered.push(prediction);
+      }
+    });
+
+    console.log(`Filtering results: ${filtered.length}/${sorted.length} predictions kept`);
+    console.log(`Prediction types: ${pastPredictions} past (${pastPredictionsWithComparison} with comparison data), ${futurePredictions} future`);
+
+    return filtered;
+  }, []);
+
+  /**
+   * Identification of past predictions
+   */
+  const CompletedPredictions = useCallback((
+    predictions: PredictionRecord[],
+    monitoringData: MonitoringRecord[]
+  ): CompletePredictionRecord[] => {
+    if (!predictions.length || !monitoringData.length) {
+      console.log(`Missing data for prediction enhancement: ${predictions.length} predictions, ${monitoringData.length} monitoring records`);
+      return [];
+    }
+
+    console.log(`Processing ${predictions.length} predictions against ${monitoringData.length} monitoring records`);
+
+    const currentTime = new Date().getTime();
+    const completePredictions: CompletePredictionRecord[] = [];
+
+    console.log("Current time reference:", new Date(currentTime).toISOString());
+
+    predictions.forEach(prediction => {
+      try {
+        let targetTimestamp: number;
+        if (prediction.predictionTimes?.targetTime) {
+          targetTimestamp = new Date(prediction.predictionTimes.targetTime).getTime();
+        } else if (prediction.predictionTime) {
+          // FIXED: Used nullish coalescing
+          const horizonHours = prediction.predictionHorizon ?? 6;
+          targetTimestamp = new Date(prediction.predictionTime).getTime() + (horizonHours * 60 * 60 * 1000);
+        } else {
+          console.warn(`Prediction ${prediction._id} has no valid time reference`);
+          return;
+        }
+
+        console.log(`Prediction ${prediction._id} target time:`, new Date(targetTimestamp).toISOString(),
+                   `(${targetTimestamp < currentTime ? 'PAST' : 'FUTURE'})`);
+
+        const isPast = targetTimestamp < currentTime;
+
+        if (isPast) {
           completePredictions.push({
             ...prediction,
             completed: true,
             comparison: null
           });
+        } else {
+          // Future prediction
+          completePredictions.push({
+            ...prediction,
+            completed: false,
+            comparison: null
+          });
         }
-      } else {
-        // Future prediction
+      } catch (error) {
+        // FIXED: Added proper error message and logging
+        console.error(`Error processing prediction ${prediction._id}:`, error);
+        // Still add the prediction with minimal data to maintain continuity
         completePredictions.push({
           ...prediction,
           completed: false,
           comparison: null
         });
       }
-    } catch (error) {
-      console.error(`Error processing prediction ${prediction._id}:`, error);
-    }
-  });
+    });
 
-  return filterTimeProximity(completePredictions);
-}, [calculateAccuracy, filterTimeProximity]);
+    return filterTimeProximity(completePredictions);
+  }, [filterTimeProximity]);
 
   /**
    * Fetch historical monitoring data based on selected time range
@@ -282,7 +227,7 @@ const CompletedPredictions = useCallback((
       // Get monitoring records from last X hours based on timeRange
       const hoursToFetch = timeRange === '24h' ? 24 : timeRange === '7d' ? 168 : 72;
 
-      const response = await fetch(`http://aquarise.tech:5154/api/v1/monitors/${poolId}?hours=${hoursToFetch}`, {
+      const response = await fetch(`http://103.24.56.162:5154/api/v1/monitors/${poolId}?hours=${hoursToFetch}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -292,15 +237,17 @@ const CompletedPredictions = useCallback((
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.detail || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData?.detail ?? `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
       setHistoricalMonitoring(data);
     } catch (err) {
       console.error("Error fetching historical monitoring data:", err);
+      // Surface the error to the user interface for better UX
+      setError(`Failed to fetch monitoring data: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
-  }, [poolId, timeRange]);
+  }, [poolId, timeRange]); // timeRange is necessary here as it affects the API call
 
   /**
    * Fetch historical predictions with increased limit
@@ -312,10 +259,10 @@ const CompletedPredictions = useCallback((
         throw new Error('Authentication token not found');
       }
 
-	  console.log(`Fetching historical predictions for pool ${poolId}`);
+      console.log(`Fetching historical predictions for pool ${poolId}`);
 
       const response = await fetch(
-        `http://aquarise.tech:5154/api/v1/predictions/${poolId}?limit=50`,
+        `http://103.24.56.162:5154/api/v1/predictions/${poolId}?limit=50`,
         {
           method: 'GET',
           headers: {
@@ -327,91 +274,105 @@ const CompletedPredictions = useCallback((
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.detail || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData?.detail ?? `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
       console.log(`Retrieved ${data.length} historical predictions`);
 
-    if (data.length === 0) {
-      console.warn('API returned empty predictions array - this may indicate a configuration issue');
+      if (data.length === 0) {
+        console.warn('API returned empty predictions array - this may indicate a configuration issue');
+      }
+
+      const now = new Date().getTime();
+      const pastPredictions = data.filter((pred: PredictionRecord) => {
+        try {
+          const targetTime = pred.predictionTimes?.targetTime
+            ? new Date(pred.predictionTimes.targetTime).getTime()
+            : new Date(pred.predictionTime).getTime() + ((pred.predictionHorizon ?? 6) * 60 * 60 * 1000);
+          return targetTime < now;
+        } catch (e) {
+          console.warn("Error calculating prediction target time:", e);
+          return false;
+        }
+      });
+
+      console.log(`Found ${pastPredictions.length} past predictions out of ${data.length} total`);
+      setHistoricalPredictions(data);
+    } catch (err) {
+      console.error("Error fetching historical predictions:", err);
+      setError(`Failed to fetch prediction history: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
-
-    const now = new Date().getTime();
-	const pastPredictions = data.filter((pred: PredictionRecord) => {
-	try {
-		const targetTime = pred.predictionTimes?.targetTime
-		? new Date(pred.predictionTimes.targetTime).getTime()
-		: new Date(pred.predictionTime).getTime() + ((pred.predictionHorizon || 6) * 60 * 60 * 1000);
-		return targetTime < now;
-	} catch (e) {
-		return false;
-	}
-	});
-
-    console.log(`Found ${pastPredictions.length} past predictions out of ${data.length} total`);
-    setHistoricalPredictions(data);
-  } catch (err) {
-    console.error("Error fetching historical predictions:", err);
-  }
-}, [poolId, timeRange]);
+  }, [poolId]);
 
   /**
    * Process predictions with monitoring data to identify completed predictions
    */
-useEffect(() => {
-  if (historicalPredictions.length > 0 && historicalMonitoring.length > 0) {
-    console.log(`Processing ${historicalPredictions.length} historical predictions and ${historicalMonitoring.length} monitoring records`);
+  useEffect(() => {
+    if (historicalPredictions.length > 0 && historicalMonitoring.length > 0) {
+      console.log(`Processing ${historicalPredictions.length} historical predictions and ${historicalMonitoring.length} monitoring records`);
 
-    if (historicalMonitoring.length > 0) {
-      const monitoringTimes = historicalMonitoring.map(m => new Date(m.createdAt).getTime());
-      console.log(`Monitoring data timespan: ${new Date(Math.min(...monitoringTimes)).toISOString()} to ${new Date(Math.max(...monitoringTimes)).toISOString()}`);
-    }
-
-    if (historicalPredictions.length > 0) {
-      const predictionTimes = historicalPredictions
-        .filter(p => p.predictionTime)
-        .map(p => new Date(p.predictionTime).getTime());
-
-      if (predictionTimes.length > 0) {
-        console.log(`Prediction creation timespan: ${new Date(Math.min(...predictionTimes)).toISOString()} to ${new Date(Math.max(...predictionTimes)).toISOString()}`);
+      if (historicalMonitoring.length > 0) {
+        const monitoringTimes = historicalMonitoring.map(m => new Date(m.createdAt).getTime());
+        console.log(`Monitoring data timespan: ${new Date(Math.min(...monitoringTimes)).toISOString()} to ${new Date(Math.max(...monitoringTimes)).toISOString()}`);
       }
+
+      if (historicalPredictions.length > 0) {
+        const predictionTimes = historicalPredictions
+          .filter(p => p.predictionTime)
+          .map(p => new Date(p.predictionTime).getTime());
+
+        if (predictionTimes.length > 0) {
+          console.log(`Prediction creation timespan: ${new Date(Math.min(...predictionTimes)).toISOString()} to ${new Date(Math.max(...predictionTimes)).toISOString()}`);
+        }
+      }
+
+      const enhanced = CompletedPredictions(historicalPredictions, historicalMonitoring);
+      setCompletePredictions(enhanced);
+
+      console.log('Enhanced predictions:', {
+        total: enhanced.length,
+        completed: enhanced.filter(p => p.completed).length,
+        withComparison: enhanced.filter(p => p.comparison !== null).length,
+        future: enhanced.filter(p => !p.completed).length
+      });
+    } else {
+      console.log(`Missing data for prediction enhancement: ${historicalPredictions.length} predictions, ${historicalMonitoring.length} monitoring records`);
     }
-
-    const enhanced = CompletedPredictions(historicalPredictions, historicalMonitoring);
-    setCompletePredictions(enhanced);
-
-    console.log('Enhanced predictions:', {
-      total: enhanced.length,
-      completed: enhanced.filter(p => p.completed).length,
-      withComparison: enhanced.filter(p => p.comparison !== null).length,
-      future: enhanced.filter(p => !p.completed).length
-    });
-  } else {
-    console.log(`Missing data for prediction enhancement: ${historicalPredictions.length} predictions, ${historicalMonitoring.length} monitoring records`);
-  }
-}, [historicalPredictions, historicalMonitoring, CompletedPredictions]);
+  }, [historicalPredictions, historicalMonitoring, CompletedPredictions]);
 
   /**
-   * Generate time series data with improved past prediction identification
-   * and comparison with actual measurements
+   * Get past prediction status text
    */
-  const TimeSeriesData = useCallback(() => {
-    if (!predictionData || historicalMonitoring.length === 0) {
-		console.log("Missing required data for chart visualization");
-      	return null;
+  const getPastPredictionStatus = (accuracyError: number): string => {
+    if (accuracyError < 10) {
+      return 'Tinggi';
+    } else if (accuracyError < 25) {
+      return 'Sedang';
+    } else {
+      return 'Rendah';
     }
+  };
 
-    const monitoringDataPoints: DataPoint[] = [];
-    const predictionPoints: DataPoint[] = [];
-    const currentTime = new Date().getTime();
+/**
+ * Generate time series data with past prediction identification
+ */
+const TimeSeriesData = useCallback(() => {
+  if (!predictionData || historicalMonitoring.length === 0) {
+    console.log("Missing required data for chart visualization");
+    return null;
+  }
 
-    // Time range filtering configuration
-    const timeRangeFilter = {
-      '24h': 24 * 60 * 60 * 1000,
-      '72h': 72 * 60 * 60 * 1000,
-      '7d': 7 * 24 * 60 * 60 * 1000
-    }[timeRange];
+  const monitoringDataPoints: DataPoint[] = [];
+  const predictionPoints: DataPoint[] = [];
+  const currentTime = new Date().getTime();
+
+  // Time range filtering configuration
+  const timeRangeFilter = {
+    '24h': 24 * 60 * 60 * 1000,
+    '72h': 72 * 60 * 60 * 1000,
+    '7d': 7 * 24 * 60 * 60 * 1000
+  }[timeRange];
 
   // Process monitoring data
   const monitoringCutoffTime = currentTime - timeRangeFilter;
@@ -436,7 +397,11 @@ useEffect(() => {
   // Process current prediction (future)
   if ((chartView === 'combined' || chartView === 'predictions') && predictionData) {
     const baseTime = new Date(predictionData.timestamp).getTime();
-    const predictionTimestamp = baseTime + (predictionHorizon * 60 * 60 * 1000);
+
+    // Add extra time padding for short predictions (ensuring 6-hour predictions are visible)
+    // For 6-hour prediction horizon, add 20% extra time buffer
+    const timePadding = predictionHorizon <= 6 ? (predictionHorizon * 60 * 60 * 1000) * 0.2 : 0;
+    const predictionTimestamp = baseTime + (predictionHorizon * 60 * 60 * 1000) + timePadding;
 
     const lastMonitoringPoint = monitoringDataPoints.length > 0 ?
       monitoringDataPoints[monitoringDataPoints.length - 1] : null;
@@ -466,30 +431,28 @@ useEffect(() => {
       oxygen: predictionData.predictions.oxygen,
       salinity: predictionData.predictions.salinity,
       acidity: predictionData.predictions.acidity,
-      predictionId: predictionData.predictionId || `current-${predictionTimestamp}`
+      predictionId: predictionData.predictionId ?? `current-${predictionTimestamp}`
     });
   }
 
   if ((chartView === 'predictions' || chartView === 'combined') && CompletePredictions.length > 0) {
     console.log(`Processing ${CompletePredictions.length} enhanced predictions for visualization`);
 
-    const completedPredictions = CompletePredictions.filter(pred =>
-      pred.completed && pred.comparison !== null
-    );
+    // Process completed predictions
+    CompletePredictions.filter(pred => pred.completed).forEach(pred => {
+      let targetTime: number;
 
-    console.log(`Found ${completedPredictions.length} completed predictions with comparison data`);
+      if (pred.predictionTimes?.targetTime) {
+        targetTime = new Date(pred.predictionTimes.targetTime).getTime();
+      } else if (pred.predictionTime) {
+        const horizonHours = pred.predictionHorizon ?? 6;
+        targetTime = new Date(pred.predictionTime).getTime() + (horizonHours * 60 * 60 * 1000);
+      } else {
+        console.warn(`Prediction ${pred._id} has no valid time reference`);
+        return;
+      }
 
-    // Process completed predictions with comparison data
-    completedPredictions.forEach(pred => {
-      if (!pred.comparison) return;
-
-      const comparison = pred.comparison;
-      const targetTime = comparison.targetTime;
-      const accuracyText = comparison.accuracy.averageError < 10 ? 'Tinggi' :
-                          comparison.accuracy.averageError < 25 ? 'Sedang' : 'Rendah';
-
-      const displayLabel = formatLocalTime(new Date(targetTime)) +
-        ` (Prediksi Terdahulu - Akurasi: ${accuracyText})`;
+      const displayLabel = formatLocalTime(new Date(targetTime)) + ' (Prediksi Terdahulu)';
 
       // Add the historical prediction point
       predictionPoints.push({
@@ -498,27 +461,11 @@ useEffect(() => {
         type: 'prediction',
         isPastPrediction: true,
         isFuture: false,
-        comparisonData: comparison,
-        temperature: pred.predictions?.temperature || 0,
-        oxygen: pred.predictions?.oxygen || 0,
-        salinity: pred.predictions?.salinity || 0,
-        acidity: pred.predictions?.acidity || 0,
+        temperature: pred.predictions?.temperature ?? 0,
+        oxygen: pred.predictions?.oxygen ?? 0,
+        salinity: pred.predictions?.salinity ?? 0,
+        acidity: pred.predictions?.acidity ?? 0,
         predictionId: pred._id
-      });
-
-      // Add corresponding actual value point
-      predictionPoints.push({
-        timestamp: comparison.monitoringTime,
-        displayTime: formatLocalTime(new Date(comparison.monitoringTime)) + ' (Aktual)',
-        type: 'prediction',
-        isPastPrediction: false,
-        isFuture: false,
-        isActual: true, // Mark as actual value point
-        temperature: comparison.actualValues.temperature,
-        oxygen: comparison.actualValues.oxygen,
-        salinity: comparison.actualValues.salinity,
-        acidity: comparison.actualValues.acidity,
-        predictionId: `actual-${pred._id}`
       });
     });
   }
@@ -542,7 +489,6 @@ useEffect(() => {
     predictions: predictionPoints.length,
     pastPredictions: predictionPoints.filter(p => p.isPastPrediction).length,
     futurePredictions: predictionPoints.filter(p => !p.isPastPrediction && p.isFuture).length,
-    actualValues: predictionPoints.filter(p => p.isActual).length,
     totalFiltered: filteredDataPoints.length,
     oldestTimestamp: filteredDataPoints.length > 0 ?
       new Date(Math.min(...filteredDataPoints.map(p => p.timestamp))).toLocaleString() : 'none',
@@ -561,9 +507,7 @@ useEffect(() => {
       type: point.type,
       isPastPrediction: Boolean(point.isPastPrediction),
       isFuture: Boolean(point.isFuture),
-      isActual: Boolean(point.isActual),
-      predictionId: point.predictionId || undefined,
-      comparisonData: point.comparisonData
+      predictionId: point.predictionId ?? undefined,
     })),
     optimals: {
       temperature: PARAMETER_THRESHOLDS.temperature.optimal,
@@ -579,13 +523,13 @@ useEffect(() => {
     }
   };
 }, [
-	chartView,
-	formatLocalTime,
-	timeRange,
-	historicalMonitoring,
-	predictionHorizon,
-	predictionData,
-	CompletePredictions,
+  chartView,
+  formatLocalTime,
+  timeRange,
+  historicalMonitoring,
+  predictionHorizon,
+  predictionData,
+  CompletePredictions,
 ]);
 
   /**
@@ -600,7 +544,7 @@ useEffect(() => {
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch(`http://aquarise.tech:5154/api/v1/predict/${poolId}`, {
+      const response = await fetch(`http://103.24.56.162:5154/api/v1/predict/${poolId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -614,12 +558,13 @@ useEffect(() => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.detail || `HTTP error! status: ${response.status}`);
+        throw new Error(errorData?.detail ?? `HTTP error! status: ${response.status}`);
       }
 
       const data: PredictionResponse = await response.json();
       setPredictionData(data);
       setLastUpdated(new Date());
+      setError(null); // Clear any previous errors
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -633,23 +578,23 @@ useEffect(() => {
    */
   useEffect(() => {
     if (poolId) {
-		let isMounted = true;
-      	const loadData = async () => {
-			try {
-				setLoading(true);
-				if (isMounted) {
-				await Promise.all([
-					fetchPrediction(),
-					fetchHistoricalMonitoring(),
-					fetchHistoricalPredictions()
-				]);
-			}
+      let isMounted = true;
+      const loadData = async () => {
+        try {
+          setLoading(true);
+          if (isMounted) {
+            await Promise.all([
+              fetchPrediction(),
+              fetchHistoricalMonitoring(),
+              fetchHistoricalPredictions()
+            ]);
+          }
         } catch (error) {
-		if (isMounted) {
-			console.error("Error loading data:", error);
-			setError("Failed to load data. Please try again.");
-		}
-      } finally {
+          if (isMounted) {
+            console.error("Error loading data:", error);
+            setError("Failed to load data. Please try again.");
+          }
+        } finally {
           if (isMounted) setLoading(false);
         }
       };
@@ -663,12 +608,12 @@ useEffect(() => {
         fetchHistoricalPredictions();
       }, 5 * 60 * 1000);
 
-    return () => {
-      isMounted = false;
-      clearInterval(intervalId);
-    };
-  }
-}, [fetchPrediction, fetchHistoricalMonitoring, fetchHistoricalPredictions, poolId, predictionHorizon, timeRange]);
+      return () => {
+        isMounted = false;
+        clearInterval(intervalId);
+      };
+    }
+  }, [fetchPrediction, fetchHistoricalMonitoring, fetchHistoricalPredictions, poolId, predictionHorizon, timeRange]);
 
   /**
    * Handler for prediction horizon change
@@ -726,7 +671,22 @@ useEffect(() => {
   }, []);
 
   /**
-   *Render prediction chart with comparison data
+   * Get display unit based on parameter
+   */
+  const getParameterUnit = (paramName: string): string => {
+    if (paramName === 'temperature') {
+      return '°C';
+    } else if (paramName === 'oxygen') {
+      return 'mg/L';
+    } else if (paramName === 'salinity') {
+      return 'ppt';
+    } else {
+      return 'pH';
+    }
+  };
+
+  /**
+   * Render prediction chart
    */
   const renderPredictionChart = useCallback(() => {
     const chartData = TimeSeriesData();
@@ -746,12 +706,10 @@ useEffect(() => {
 
     const pastPredictionCount = chartData.pointTypes.filter(pt =>
       pt.type === 'prediction' && pt.isPastPrediction).length;
-    const comparisonCount = chartData.pointTypes.filter(pt =>
-      pt.comparisonData !== undefined).length;
     const futurePredictionCount = chartData.pointTypes.filter(pt =>
       pt.type === 'prediction' && pt.isFuture).length;
 
-    console.log(`Rendering chart with ${pastPredictionCount} past predictions (${comparisonCount} with comparison data) and ${futurePredictionCount} future predictions in ${chartView} mode`);
+    console.log(`Rendering chart with ${pastPredictionCount} past predictions and ${futurePredictionCount} future predictions in ${chartView} mode`);
 
     return (
       <Card
@@ -830,7 +788,7 @@ useEffect(() => {
     if (!predictionData) return null;
 
     const currentValues = predictionData.currentValues || {};
-  	const predictions = predictionData.predictions || {};
+    const predictions = predictionData.predictions || {};
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -919,22 +877,22 @@ useEffect(() => {
   }
 
   const { classification, confidence, explanation } = predictionData;
-  const qualityColor = QUALITY_COLORS[classification as keyof typeof QUALITY_COLORS] || '#1890ff';
+  const qualityColor = QUALITY_COLORS[classification as keyof typeof QUALITY_COLORS] ?? '#1890ff';
 
   return (
     <div className="mt-8 w-full">
       {/* Prediction Horizon Selector */}
       <Card className="mb-4 shadow-sm" variant="borderless">
         <div className="flex justify-between items-center mb-4">
-			<Tabs
-			activeKey={predictionHorizon.toString()}
-			onChange={handleHorizonChange}
-			items={[
-				{ key: '6', label: '6 Jam' },
-				{ key: '12', label: '12 Jam' },
-				{ key: '24', label: '24 Jam' }
-			]}
-			/>
+          <Tabs
+            activeKey={predictionHorizon.toString()}
+            onChange={handleHorizonChange}
+            items={[
+              { key: '6', label: '6 Jam' },
+              { key: '12', label: '12 Jam' },
+              { key: '24', label: '24 Jam' }
+            ]}
+          />
 
           <Tooltip title="Refresh Data">
             <button
@@ -1017,7 +975,7 @@ useEffect(() => {
       {/* Parameter Comparison Grid */}
       {parameterCards}
 
-      {/* Prediction Chart with comparison data */}
+      {/* Prediction Chart */}
       {renderPredictionChart()}
 
       {/* Detailed Parameter Analysis */}
@@ -1065,12 +1023,16 @@ useEffect(() => {
                   <div className="text-lg font-semibold">{displayKey.charAt(0).toUpperCase() + displayKey.slice(1)}</div>
                   <Badge
                     color={STATUS_COLORS[paramStatus]}
-                    text={paramStatus === 'optimal' ? 'Optimal' :
-                          paramStatus === 'acceptable' ? 'Dapat Diterima' : 'Di Luar Rentang'}
+                    text={
+                      // FIXED: Extracted nested ternary
+                      paramStatus === 'optimal' ? 'Optimal' :
+                      paramStatus === 'acceptable' ? 'Dapat Diterima' :
+                                                    'Di Luar Rentang'
+                    }
                   />
                 </div>
 
-                {/* Visualization content - enhanced for clarity */}
+                {/* Visualization content */}
                 <div className="mb-4">
                   <div className="relative h-10 bg-gray-200 rounded">
                     {/* Optimal range */}

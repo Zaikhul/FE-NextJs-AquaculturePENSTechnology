@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider, Tooltip } from 'antd';
+import { Divider } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { ChartLegendProps } from '@/interfaces/prediction';
 
@@ -22,7 +22,7 @@ const ChartLegend: React.FC<ChartLegendProps> = ({
   const PredictionLegendSection = () => (
     <div className="mt-3 border-t pt-3 border-gray-200">
       <div className="font-medium mb-2">Hasil Prediksi & Evaluasi</div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         {/* Future prediction */}
         <div className="flex items-center">
           <div className="flex items-center">
@@ -40,20 +40,12 @@ const ChartLegend: React.FC<ChartLegendProps> = ({
           </div>
           <span className="text-sm">Prediksi Terdahulu</span>
         </div>
-
-        {/* Actual values */}
-        <div className="flex items-center">
-          <div className="flex items-center">
-            <div className="w-4 h-4 transform rotate-45 bg-green-500 mr-2"></div>
-          </div>
-          <span className="text-sm">Nilai Aktual</span>
-        </div>
       </div>
 
       <div className="mt-2 p-2 bg-blue-50 rounded-md text-xs text-blue-800">
         <InfoCircleOutlined className="mr-1" />
-        Pada grafik, prediksi terdahulu (persegi ungu) dapat dibandingkan dengan nilai aktual (segitiga hijau)
-        untuk mengevaluasi akurasi model prediksi. Hover pada titik prediksi terdahulu untuk melihat tingkat akurasi.
+        Pada grafik, prediksi terdahulu (persegi ungu) ditampilkan untuk
+        mengevaluasi riwayat hasil prediksi. Hover pada titik prediksi terdahulu untuk melihat detailnya.
       </div>
     </div>
   );
@@ -146,8 +138,7 @@ const ChartLegend: React.FC<ChartLegendProps> = ({
               {(chartView === 'predictions' || chartView === 'combined') && (
                 <>
                   <li>Bulat merah: prediksi mendatang untuk {predictionHorizon} jam ke depan</li>
-                  <li>Persegi ungu: prediksi terdahulu yang dapat dievaluasi akurasinya</li>
-                  <li>Segitiga hijau: nilai aktual pengukuran untuk prediksi terdahulu</li>
+                  <li>Persegi ungu: prediksi terdahulu</li>
                 </>
               )}
             </ul>

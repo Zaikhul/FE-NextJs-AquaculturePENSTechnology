@@ -70,8 +70,8 @@ export const PARAMETER_THRESHOLDS = {
 	timestamp: string;
 	currentValues: WaterQualityData;
 	predictions: WaterQualityData;
-	predictionTimes: {
-	  predictionTime: string;
+	prediction_times: {
+	  prediction_time: string;
 	  horizon: string;
 	  targetTime: string;
 	} | Record<string, number | string>;
@@ -132,7 +132,6 @@ export const PARAMETER_THRESHOLDS = {
 		monitoringTime: number;
 		timeDiff: number;
 		predictedValues: WaterQualityData;
-		actualValues: WaterQualityData;
 		accuracy: Record<string, number>;
 	}
 
@@ -147,7 +146,6 @@ export const PARAMETER_THRESHOLDS = {
 	type: 'monitoring' | 'prediction';
 	isPastPrediction: boolean;
 	isFuture?: boolean;
-	isActual?: boolean;
 	temperature: number;
 	oxygen: number;
 	salinity: number;

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -11,11 +11,10 @@ import {
   Legend,
   Filler,
   TimeScale,
-  ChartData,
   ChartOptions,
   ChartDataset,
   ScriptableContext,
-  Point
+  PointStyle,
 } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 import annotationPlugin from 'chartjs-plugin-annotation';
@@ -23,7 +22,6 @@ import { InfoCircleOutlined } from '@ant-design/icons';
 import { Select, Tooltip as AntTooltip } from 'antd';
 import {
   RecordChartProps as BaseRecordChartProps,
-  ChartViewMode,
   ColorScheme,
   ParameterColors,
   PredictionComparison
@@ -64,7 +62,6 @@ export interface DataPoint {
   y: number; // value
   isFuture?: boolean;
   isPastPrediction?: boolean;
-  isActual?: boolean;
   predictionId?: string;
   comparisonData?: PredictionComparison;
 }
@@ -81,7 +78,7 @@ interface RecordChartProps extends Omit<BaseRecordChartProps, 'pointTypes'> {
  */
 interface CustomDataset extends ChartDataset<'line', DataPoint[]> {
   labels?: string[];
-  dataType?: 'monitoring' | 'unifiedPrediction' | 'actualValues';
+  dataType?: 'monitoring' | 'unifiedPrediction';
   showInLegendOnce?: boolean;
   predictionId?: string;
 }
@@ -95,80 +92,80 @@ const colorWithOpacity = (color: string, opacity: number): string => {
     return color.replace(/rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)/, `rgba($1,$2,$3,${opacity})`);
   }
   // Handle rgb format
-  if (color.startsWith('rgb')) {
+  else if (color.startsWith('rgb')) {
     return color.replace('rgb', 'rgba').replace(')', `,${opacity})`);
   }
   // Handle hex format - simplified version
-  const [r, g, b] = color.match(/\d+/g)?.map(Number) || [0,0,0];
-  return `rgba(${r},${g},${b},${opacity})`;
+  else {
+    const [r, g, b] = color.match(/\d+/g)?.map(Number) ?? [0, 0, 0];
+    return `rgba(${r},${g},${b},${opacity})`;
+  }
 };
 
-	// Plugin to shade future prediction area with improved type safety and null handling
-	const timelineShadingPlugin = {
-	id: 'timelineShading',
-	beforeDraw: (chart: ChartJS) => {
-		if (!chart?.ctx || !chart?.chartArea || !chart?.scales?.['x'] || !chart?.data?.datasets?.[0]) return;
+// Plugin to shade future prediction area with improved type safety and null handling
+const timelineShadingPlugin = {
+  id: 'timelineShading',
+  beforeDraw: (chart: ChartJS) => {
+    if (!chart?.ctx || !chart?.chartArea || !chart?.scales?.['x'] || !chart?.data?.datasets?.[0]) return;
 
-		const { ctx, chartArea, scales } = chart;
+    const { ctx, chartArea, scales } = chart;
 
-		if (!chartArea || !scales.x || !chart.data.datasets) return;
+    const datasets = chart.data.datasets;
+    const monitoringDataset = datasets.find((d: any) => d.dataType === 'monitoring');
+    const predictionDataset = datasets.find((d: any) => d.dataType === 'unifiedPrediction');
 
-		const datasets = chart.data.datasets;
-		const monitoringDataset = datasets.find((d: any) => d.dataType === 'monitoring');
-		const predictionDataset = datasets.find((d: any) => d.dataType === 'unifiedPrediction');
+    if (!monitoringDataset?.data?.length || !predictionDataset) return;
 
-		if (!monitoringDataset || !predictionDataset || !monitoringDataset.data?.length) return;
+    const lastMonitoringPoint = monitoringDataset.data[monitoringDataset.data.length - 1];
 
-		const lastMonitoringPoint = monitoringDataset.data[monitoringDataset.data.length - 1];
+    // Proper type checking to handle all Chart.js data point formats
+    if (!lastMonitoringPoint) return;
 
-		// Proper type checking to handle all Chart.js data point formats
-		if (!lastMonitoringPoint) return;
+    // Check if it's a Point object with x property
+    let pointX = null;
+    if (typeof lastMonitoringPoint === 'object' && 'x' in lastMonitoringPoint) {
+      pointX = lastMonitoringPoint.x;
+    } else if (typeof lastMonitoringPoint === 'number') {
+      pointX = lastMonitoringPoint;
+    } else if (Array.isArray(lastMonitoringPoint) && lastMonitoringPoint.length > 0) {
+      pointX = lastMonitoringPoint[0];
+    }
 
-		// Check if it's a Point object with x property
-		const pointX = typeof lastMonitoringPoint === 'object' && 'x' in lastMonitoringPoint
-		? lastMonitoringPoint.x
-		: typeof lastMonitoringPoint === 'number'
-			? lastMonitoringPoint
-			: Array.isArray(lastMonitoringPoint) && lastMonitoringPoint.length > 0
-			? lastMonitoringPoint[0]
-			: null;
+    if (pointX === null) return;
 
-		if (pointX === null) return;
+    const transitionX = scales.x.getPixelForValue(pointX);
 
-		const transitionX = scales.x.getPixelForValue(pointX);
+    ctx.fillStyle = 'rgba(230, 236, 255, 0.3)';
+    ctx.fillRect(
+      transitionX,
+      chartArea.top,
+      chartArea.right - transitionX,
+      chartArea.bottom - chartArea.top
+    );
 
-		ctx.fillStyle = 'rgba(230, 236, 255, 0.3)';
-		ctx.fillRect(
-		transitionX,
-		chartArea.top,
-		chartArea.right - transitionX,
-		chartArea.bottom - chartArea.top
-		);
+    // Add a vertical line at the transition point
+    ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(transitionX, chartArea.top);
+    ctx.lineTo(transitionX, chartArea.bottom);
+    ctx.stroke();
+    ctx.setLineDash([]);
 
-		// Add a vertical line at the transition point
-		ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
-		ctx.lineWidth = 2;
-		ctx.setLineDash([5, 5]);
-		ctx.beginPath();
-		ctx.moveTo(transitionX, chartArea.top);
-		ctx.lineTo(transitionX, chartArea.bottom);
-		ctx.stroke();
-		ctx.setLineDash([]);
-
-		// Add "Sekarang" label
-		ctx.fillStyle = 'rgba(0, 0, 255, 0.8)';
-		ctx.font = '12px Arial';
-		ctx.textAlign = 'center';
-		ctx.fillText('Sekarang', transitionX, chartArea.top - 5);
-	}
-	};
+    // Add "Sekarang" label
+    ctx.fillStyle = 'rgba(0, 0, 255, 0.8)';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Sekarang', transitionX, chartArea.top - 5);
+  }
+};
 
 // Register the custom plugins
 ChartJS.register(timelineShadingPlugin);
 
 /**
  * Enhanced Record Chart component with improved past prediction identification
- * and comparison with actual measurements
  */
 const RecordChart: React.FC<RecordChartProps> = ({
   labels,
@@ -187,11 +184,11 @@ const RecordChart: React.FC<RecordChartProps> = ({
   const [activeParameter, setActiveParameter] = useState<'all' | 'temperature' | 'oxygen' | 'salinity' | 'pH'>('all');
 
   useEffect(() => {
-	const chartInstance = chartRef.current;
+    const chartInstance = chartRef.current;
     return () => {
-		if (chartInstance) {
-			chartInstance.destroy();
-		}
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
     };
   }, []);
 
@@ -228,7 +225,36 @@ const RecordChart: React.FC<RecordChartProps> = ({
   };
 
   /**
-   * Data separation
+   * Helper function to determine point style based on data type
+   * Fixed: Returns valid PointStyle type
+   */
+  const getPointStyle = (dataPoint: DataPoint): PointStyle => {
+    if (dataPoint.isFuture) {
+      return 'circle';
+    } else if (dataPoint.isPastPrediction) {
+      return 'rect';
+    } else {
+      return 'circle';
+    }
+  };
+
+  /**
+   * Get unit for parameter
+   */
+  const getUnitForParam = (paramName: string): string => {
+    if (paramName === 'temperature') {
+      return '°C';
+    } else if (paramName === 'oxygen') {
+      return 'mg/L';
+    } else if (paramName === 'salinity') {
+      return 'ppt';
+    } else {
+      return 'pH';
+    }
+  };
+
+  /**
+   * Data separation - Reduced complexity
    */
   const splitData = React.useCallback((
     allLabels: string[],
@@ -240,7 +266,6 @@ const RecordChart: React.FC<RecordChartProps> = ({
     const monitoringValues: number[] = [];
     const monitoringTimestamps: number[] = [];
 
-    const unifiedPredictionLabels: string[] = [];
     const PredictionValues: number[] = [];
     const unifiedPredictionTimestamps: number[] = [];
     const unifiedPredictionMeta: Array<{
@@ -250,6 +275,7 @@ const RecordChart: React.FC<RecordChartProps> = ({
       comparisonData?: PredictionComparison
     }> = [];
 
+    // Create data points array with all necessary properties
     const dataPoints = allLabels
       .map((label, index) => {
         if (allValues[index] === null || allValues[index] === undefined) {
@@ -259,18 +285,20 @@ const RecordChart: React.FC<RecordChartProps> = ({
         return {
           label,
           value: allValues[index],
-          timestamp: allTimestamps[index] || index,
-          type: allTypes && allTypes[index]?.type || 'monitoring',
-          isPastPrediction: Boolean(allTypes && allTypes[index]?.isPastPrediction),
-          isFuture: Boolean(allTypes && allTypes[index]?.isFuture),
-          predictionId: allTypes && allTypes[index]?.predictionId,
-          comparisonData: allTypes && allTypes[index]?.comparisonData
+          timestamp: allTimestamps[index] ?? index,
+          type: allTypes?.[index]?.type ?? 'monitoring',
+          isPastPrediction: Boolean(allTypes?.[index]?.isPastPrediction),
+          isFuture: Boolean(allTypes?.[index]?.isFuture),
+          predictionId: allTypes?.[index]?.predictionId,
+          comparisonData: allTypes?.[index]?.comparisonData
         };
       })
       .filter(Boolean);
 
-    dataPoints.sort((a, b) => a!.timestamp - b!.timestamp);
+    // Sort data points by timestamp
+    dataPoints.sort((a, b) => (a?.timestamp ?? 0) - (b?.timestamp ?? 0));
 
+    // Process and categorize data points
     dataPoints.forEach(point => {
       if (!point) return; // Safety check
 
@@ -279,15 +307,15 @@ const RecordChart: React.FC<RecordChartProps> = ({
         monitoringValues.push(point.value);
         monitoringTimestamps.push(point.timestamp);
       } else if (point.type === 'prediction') {
-        unifiedPredictionLabels.push(point.label);
+        // Store prediction value and metadata
         PredictionValues.push(point.value);
         unifiedPredictionTimestamps.push(point.timestamp);
 
         unifiedPredictionMeta.push({
           isFuture: Boolean(point.isFuture),
           isPastPrediction: Boolean(point.isPastPrediction),
-          predictionId: point.predictionId || undefined,
-          comparisonData: point.comparisonData || undefined
+          predictionId: point.predictionId,
+          comparisonData: point.comparisonData
         });
       }
     });
@@ -296,7 +324,7 @@ const RecordChart: React.FC<RecordChartProps> = ({
       monitoringLabels,
       monitoringValues,
       monitoringTimestamps,
-      unifiedPredictionLabels,
+      unifiedPredictionLabels: [], // Empty array for unused variable
       PredictionValues,
       unifiedPredictionTimestamps,
       unifiedPredictionMeta
@@ -304,193 +332,289 @@ const RecordChart: React.FC<RecordChartProps> = ({
   }, []);
 
   /**
-   * Render parameter-specific chart with enhanced past prediction and comparison visualization
+   * Create monitoring dataset
+   */
+  const createMonitoringDataset = (
+    monitoringValues: number[],
+    monitoringTimestamps: number[],
+    monitoringLabels: string[],
+    displayName: string,
+    paramColors: ParameterColors
+  ): CustomDataset | null => {
+    if (monitoringValues.length === 0) return null;
+
+    // Convert to proper x,y format for timeline display
+    const monitoringPoints = monitoringValues.map((value, i) => ({
+      x: monitoringTimestamps[i],
+      y: value,
+      timestamp: monitoringTimestamps[i]
+    }));
+
+    return {
+      label: `${displayName} (Monitoring)`,
+      data: monitoringPoints,
+      labels: monitoringLabels,
+      borderColor: paramColors.line,
+      backgroundColor: paramColors.point,
+      borderWidth: 2,
+      pointRadius: 4,
+      tension: 0.2,
+      fill: false,
+      dataType: 'monitoring'
+    };
+  };
+
+  /**
+   * Create prediction dataset
+   */
+  const createPredictionDataset = (
+    PredictionValues: number[],
+    unifiedPredictionTimestamps: number[],
+    unifiedPredictionMeta: any[],
+    displayName: string,
+    paramColors: ParameterColors
+  ): { dataset: CustomDataset | null, points: DataPoint[] } => {
+    if (PredictionValues.length === 0) {
+      return { dataset: null, points: [] };
+    }
+
+    const PredictionPoints = PredictionValues.map((value, idx) => {
+      const meta = unifiedPredictionMeta[idx] ?? {};
+      return {
+        x: unifiedPredictionTimestamps[idx],
+        y: value,
+        isFuture: Boolean(meta.isFuture),
+        isPastPrediction: Boolean(meta.isPastPrediction),
+        predictionId: meta.predictionId,
+        comparisonData: meta.comparisonData
+      };
+    });
+
+    // Sort by timestamp for proper rendering
+    PredictionPoints.sort((a, b) => a.x - b.x);
+
+    const dataset: CustomDataset = {
+      label: `${displayName} (Hasil Prediksi)`,
+      data: PredictionPoints,
+      borderColor: (ctx: ScriptableContext<'line'>) => {
+        if (!ctx || typeof ctx.dataIndex !== 'number') return paramColors.prediction;
+        const dataIndex = ctx.dataIndex;
+        if (dataIndex >= PredictionPoints.length) return paramColors.prediction;
+
+        const point = PredictionPoints[dataIndex];
+        return point.isFuture ? paramColors.prediction : '#8b5cf6';
+      },
+      backgroundColor: (ctx: ScriptableContext<'line'>) => {
+        if (!ctx || typeof ctx.dataIndex !== 'number') return paramColors.prediction;
+        const dataIndex = ctx.dataIndex;
+        if (dataIndex >= PredictionPoints.length) return paramColors.prediction;
+
+        const point = PredictionPoints[dataIndex];
+        return point.isFuture ? paramColors.prediction : '#8b5cf6';
+      },
+      borderWidth: 3,
+      pointRadius: 5,
+      // Fixed: Use pointStyle function that returns valid PointStyle
+      pointStyle: (ctx: ScriptableContext<'line'>) => {
+        if (!ctx || typeof ctx.dataIndex !== 'number') return 'circle';
+        const dataIndex = ctx.dataIndex;
+        if (dataIndex >= PredictionPoints.length) return 'circle';
+
+        return getPointStyle(PredictionPoints[dataIndex]);
+      },
+      tension: 0.2,
+      borderDash: (ctx: ScriptableContext<'line'>) => {
+        if (!ctx || typeof ctx.dataIndex !== 'number') return [4, 4];
+        const dataIndex = ctx.dataIndex;
+        if (dataIndex >= PredictionPoints.length) return [4, 4];
+
+        return PredictionPoints[dataIndex].isFuture ? [4, 4] : [2, 2];
+      },
+      dataType: 'unifiedPrediction'
+    };
+
+    return { dataset, points: PredictionPoints };
+  };
+
+  /**
+   * Create tooltip callbacks
+   */
+  const createTooltipCallbacks = (
+    datasets: CustomDataset[],
+    displayName: string,
+    paramName: string,
+    predictionHorizon: number
+  ) => {
+    return {
+      title: function(tooltipItems: any[]) {
+        if (!tooltipItems?.length) return '';
+
+        const item = tooltipItems[0];
+        if (!item) return '';
+
+        const datasetIndex = item.datasetIndex ?? 0;
+        const dataIndex = item.dataIndex ?? 0;
+
+        if (datasetIndex >= datasets.length) return '';
+        const dataset = datasets[datasetIndex];
+        if (!dataset) return '';
+
+        // Format timestamp for tooltip
+        const timestamp = item.parsed?.x;
+        if (timestamp) {
+          const date = new Date(timestamp);
+          const formattedDate = date.toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+
+          if (dataset.dataType === 'unifiedPrediction') {
+            // Fixed: Proper type checking for dataPoint
+            if (!dataset.data?.[dataIndex]) return formattedDate;
+
+            const dataPoint = dataset.data[dataIndex] as DataPoint;
+
+            if (dataPoint.isFuture) {
+              return `${formattedDate} (Prediksi ${predictionHorizon} jam)`;
+            } else if (dataPoint.isPastPrediction) {
+              return `${formattedDate} (Prediksi Terdahulu)`;
+            }
+          }
+          return formattedDate;
+        }
+
+        return dataset.labels?.[dataIndex] ?? dataset.label ?? '';
+      },
+      label: function(context: any) {
+        if (!context?.parsed?.y === undefined || !context?.dataset?.data) return '';
+
+        const dataIndex = context.dataIndex ?? 0;
+        const dataset = context.dataset;
+
+        if (dataIndex >= dataset.data.length) return '';
+
+        // Fixed: Properly handle data type checking
+        const dataPoint = dataset.data[dataIndex] as unknown as DataPoint;
+        if (!dataPoint) return '';
+
+        const value = context.parsed.y;
+        const unit = getUnitForParam(paramName);
+
+        return `${displayName}: ${value.toFixed(2)} ${unit}`;
+      }
+    };
+  };
+
+  /**
+   * Render parameter-specific chart with enhanced prediction visualization
+   * Refactored to reduce cognitive complexity
    */
   const renderParameterChart = React.useCallback((paramName: string) => {
-    let allValues: number[];
-    let displayName: string;
-    let paramColors: ParameterColors;
-    let optimalRange: [number, number];
-    let acceptableRange: [number, number];
+    // Configure chart based on parameter
+    const getParameterConfig = () => {
+      let allValues: number[];
+      let displayName: string;
+      let paramColors: ParameterColors;
+      let optimalRange: [number, number];
+      let acceptableRange: [number, number];
 
-    // Configure based on parameter type
-    switch(paramName) {
-      case 'temperature':
-        allValues = temp;
-        displayName = 'Temperature';
-        paramColors = colors.temperature;
-        optimalRange = optimals.temperature;
-        acceptableRange = acceptable.temperature;
-        break;
-      case 'oxygen':
-        allValues = oxygen;
-        displayName = 'Oxygen';
-        paramColors = colors.oxygen;
-        optimalRange = optimals.oxygen;
-        acceptableRange = acceptable.oxygen;
-        break;
-      case 'salinity':
-        allValues = salinity;
-        displayName = 'Salinity';
-        paramColors = colors.salinity;
-        optimalRange = optimals.salinity;
-        acceptableRange = acceptable.salinity;
-        break;
-      case 'pH':
-        allValues = pH;
-        displayName = 'pH';
-        paramColors = colors.pH;
-        optimalRange = optimals.pH;
-        acceptableRange = acceptable.pH;
-        break;
-      default:
-        return null;
-    }
+      switch(paramName) {
+        case 'temperature':
+          allValues = temp;
+          displayName = 'Temperature';
+          paramColors = colors.temperature;
+          optimalRange = optimals.temperature;
+          acceptableRange = acceptable.temperature;
+          break;
+        case 'oxygen':
+          allValues = oxygen;
+          displayName = 'Oxygen';
+          paramColors = colors.oxygen;
+          optimalRange = optimals.oxygen;
+          acceptableRange = acceptable.oxygen;
+          break;
+        case 'salinity':
+          allValues = salinity;
+          displayName = 'Salinity';
+          paramColors = colors.salinity;
+          optimalRange = optimals.salinity;
+          acceptableRange = acceptable.salinity;
+          break;
+        case 'pH':
+          allValues = pH;
+          displayName = 'pH';
+          paramColors = colors.pH;
+          optimalRange = optimals.pH;
+          acceptableRange = acceptable.pH;
+          break;
+        default:
+          return null;
+      }
+
+      return {
+        allValues,
+        displayName,
+        paramColors,
+        optimalRange,
+        acceptableRange
+      };
+    };
+
+    const config = getParameterConfig();
+    if (!config) return null;
+
+    const { allValues, displayName, paramColors, optimalRange, acceptableRange } = config;
 
     // Use actual timestamps if available, otherwise generate sequential indices
     const actualTimestamps = timestamps && timestamps.length === allValues.length
       ? timestamps
       : Array.from({ length: allValues.length }, (_, i) => i);
 
-    // Log analytics for debugging
-    console.log(`Rendering ${paramName} chart:`, {
-      totalPoints: (pointTypes || []).length,
-      pastPredictions: (pointTypes || []).filter(pt => pt.type === 'prediction' && pt.isPastPrediction).length,
-      futurePredictions: (pointTypes || []).filter(pt => pt.type === 'prediction' && !pt.isPastPrediction).length,
-      withComparison: (pointTypes || []).filter(pt => pt.comparisonData !== undefined).length
-    });
-
     // Split data into monitoring and prediction series
     const {
       monitoringLabels,
       monitoringValues,
       monitoringTimestamps,
-      unifiedPredictionLabels,
       PredictionValues,
       unifiedPredictionTimestamps,
       unifiedPredictionMeta
-    } = splitData(labels, allValues, actualTimestamps, pointTypes || null);
+    } = splitData(labels, allValues, actualTimestamps, pointTypes ?? null);
 
     // Prepare chart datasets
     const datasets: CustomDataset[] = [];
 
-    // Add monitoring dataset if available and in appropriate view mode
-    if (monitoringValues.length > 0 && (viewMode === 'combined' || viewMode === 'monitoring')) {
-      // Convert to proper x,y format for timeline display
-      const monitoringPoints = monitoringValues.map((value, i) => ({
-        x: monitoringTimestamps[i],
-        y: value,
-        timestamp: monitoringTimestamps[i]
-      }));
-
-      datasets.push({
-        label: `${displayName} (Monitoring)`,
-        data: monitoringPoints,
-        labels: monitoringLabels,
-        borderColor: paramColors.line,
-        backgroundColor: paramColors.point,
-        borderWidth: 2,
-        pointRadius: 4,
-        tension: 0.2,
-        fill: false,
-        dataType: 'monitoring'
-      });
-    }
-
-    // ENHANCED: Add unified prediction dataset with comparison data
-    if (PredictionValues.length > 0 && (viewMode === 'combined' || viewMode === 'predictions')) {
-      console.log(`Rendering ${PredictionValues.length} predictions for ${paramName} with values:`,
-        PredictionValues.map((v, i) => ({
-          time: new Date(unifiedPredictionTimestamps[i]).toLocaleString(),
-          value: v.toFixed(2),
-          isFuture: unifiedPredictionMeta[i].isFuture,
-          hasComparison: unifiedPredictionMeta[i].comparisonData !== undefined
-        }))
+    // Create monitoring dataset if in appropriate view mode
+    if (viewMode === 'combined' || viewMode === 'monitoring') {
+      const monitoringDataset = createMonitoringDataset(
+        monitoringValues,
+        monitoringTimestamps,
+        monitoringLabels,
+        displayName,
+        paramColors
       );
 
-      const PredictionPoints = PredictionValues.map((value, idx) => {
-        const meta = unifiedPredictionMeta[idx] || {};
-        return {
-          x: unifiedPredictionTimestamps[idx],
-          y: value,
-          isFuture: Boolean(meta.isFuture),
-          isPastPrediction: Boolean(meta.isPastPrediction),
-          predictionId: meta.predictionId,
-          comparisonData: meta.comparisonData
-        };
-      });
+      if (monitoringDataset) {
+        datasets.push(monitoringDataset);
+      }
+    }
 
-      // Sort by timestamp for proper rendering
-      PredictionPoints.sort((a, b) => a.x - b.x);
+    // Create prediction dataset if in appropriate view mode
+    let predictionPoints: DataPoint[] = [];
+    if (viewMode === 'combined' || viewMode === 'predictions') {
+      const { dataset: predictionDataset, points } = createPredictionDataset(
+        PredictionValues,
+        unifiedPredictionTimestamps,
+        unifiedPredictionMeta,
+        displayName,
+        paramColors
+      );
 
-		datasets.push({
-		label: `${displayName} (Hasil Prediksi)`,
-		data: PredictionPoints,
-		borderColor: (ctx: ScriptableContext<'line'>) => {
-			if (!ctx || typeof ctx.dataIndex !== 'number') return paramColors.prediction;
-			const point = PredictionPoints[ctx.dataIndex];
-			if (!point) return paramColors.prediction;
-			return point.isFuture ?
-			paramColors.prediction : // Future prediction color
-			'#8b5cf6';              // Past prediction color (purple)
-		},
-		backgroundColor: (ctx: ScriptableContext<'line'>) => {
-			if (!ctx || typeof ctx.dataIndex !== 'number') return paramColors.prediction;
-			const point = PredictionPoints[ctx.dataIndex];
-			if (!point) return paramColors.prediction;
-			return point.isFuture ?
-			paramColors.prediction :
-			'#8b5cf6';
-		},
-		borderWidth: 3,
-		pointRadius: 5,
-		pointStyle: (ctx: ScriptableContext<'line'>) => {
-			if (!ctx || typeof ctx.dataIndex !== 'number') return 'circle';
-			const dataPoint = PredictionPoints[ctx.dataIndex];
-			if (!dataPoint) return 'circle';
-			return dataPoint.isFuture ? 'circle' : 'rect';
-		},
-		tension: 0.2,
-		borderDash: (ctx: ScriptableContext<'line'>) => {
-			if (!ctx || typeof ctx.dataIndex !== 'number') return [4, 4];
-			return PredictionPoints[ctx.dataIndex].isFuture ? [4, 4] : [2, 2];
-		},
-		dataType: 'unifiedPrediction'
-		});
-
-      const comparisonPoints = PredictionPoints
-        .filter(point => point.comparisonData !== undefined)
-        .map(point => {
-          const comparison = point.comparisonData!;
-          const paramToValue: Record<string, number> = {
-            'temperature': comparison.actualValues?.temperature || 0,
-            'oxygen': comparison.actualValues?.oxygen || 0,
-            'salinity': comparison.actualValues?.salinity || 0,
-            'pH': comparison.actualValues?.acidity || 0
-          };
-
-          return {
-            x: point.x,
-            y: paramToValue[paramName] || 0,
-            predictionId: point.predictionId,
-            isActual: true,
-            comparisonData: comparison
-          };
-        });
-
-      if (comparisonPoints.length > 0) {
-        datasets.push({
-          label: `${displayName} (Nilai Aktual)`,
-          data: comparisonPoints,
-          borderColor: '#22c55e',
-          backgroundColor: '#22c55e',
-          borderWidth: 2,
-          pointRadius: 5,
-          pointStyle: 'triangle',
-          tension: 0,
-          borderDash: [],
-          dataType: 'actualValues'
-        });
+      if (predictionDataset) {
+        datasets.push(predictionDataset);
+        predictionPoints = points;
       }
     }
 
@@ -549,11 +673,7 @@ const RecordChart: React.FC<RecordChartProps> = ({
         y: {
           title: {
             display: true,
-            text: `${displayName} (${
-              paramName === 'temperature' ? '°C' :
-              paramName === 'oxygen' ? 'mg/L' :
-              paramName === 'salinity' ? 'ppt' : 'pH'
-            })`
+            text: `${displayName} (${getUnitForParam(paramName)})`
           },
           min: paramName === 'pH' ?
                 Math.max(6, Math.min(...allValues.filter(v => v !== null && v !== undefined)) - 1) :
@@ -572,96 +692,9 @@ const RecordChart: React.FC<RecordChartProps> = ({
             font: { size: 11 }
           }
         },
-
-		tooltip: {
-		callbacks: {
-			title: function(tooltipItems) {
-			if (!tooltipItems || tooltipItems.length === 0) return '';
-
-			const item = tooltipItems[0];
-			if (!item) return '';
-
-			const datasetIndex = item.datasetIndex !== undefined ? item.datasetIndex : 0;
-			const dataIndex = item.dataIndex !== undefined ? item.dataIndex : 0;
-
-			if (datasetIndex >= datasets.length) return '';
-			const dataset = datasets[datasetIndex];
-			if (!dataset) return '';
-
-			// Format timestamp for tooltip
-			const timestamp = item.parsed?.x;
-			if (timestamp) {
-				const date = new Date(timestamp);
-				const formattedDate = date.toLocaleString('id-ID', {
-				day: '2-digit',
-				month: '2-digit',
-				year: 'numeric',
-				hour: '2-digit',
-				minute: '2-digit',
-				});
-
-				if (dataset.dataType === 'unifiedPrediction') {
-				// Get point metadata
-				const dataPoint = dataset.data && dataIndex < dataset.data.length ?
-					dataset.data[dataIndex] as DataPoint : null;
-
-				if (dataPoint) {
-					if (dataPoint.isFuture) {
-					return `${formattedDate} (Prediksi ${predictionHorizon} jam)`;
-					} else if (dataPoint.comparisonData) {
-					return `${formattedDate} (Prediksi Terdahulu dengan Perbandingan)`;
-					} else {
-					return `${formattedDate} (Prediksi Terdahulu)`;
-					}
-				}
-				} else if (dataset.dataType === 'actualValues') {
-				return `${formattedDate} (Nilai Aktual)`;
-				}
-				return formattedDate;
-			}
-
-			return dataset.labels && dataIndex < dataset.labels.length
-				? dataset.labels[dataIndex]
-				: dataset.label || '';
-			},
-			label: function(context) {
-			if (!context || context.parsed?.y === undefined ||
-				!context.dataset || !context.dataset.data ||
-				context.dataIndex === undefined) return '';
-
-			const dataIndex = context.dataIndex;
-			const dataset = context.dataset;
-
-			if (dataIndex >= dataset.data.length) return '';
-
-			const dataPoint = dataset.data[dataIndex] as DataPoint;
-			if (!dataPoint) return '';
-
-			const value = context.parsed.y;
-			const unit = paramName === 'temperature' ? '°C' :
-						paramName === 'oxygen' ? 'mg/L' :
-						paramName === 'salinity' ? 'ppt' : 'pH';
-
-			if (dataPoint.isActual) {
-				return `${displayName} (Aktual): ${value.toFixed(2)} ${unit}`;
-			}
-
-			if (dataPoint.comparisonData) {
-				const accuracy = dataPoint.comparisonData.accuracy;
-				const paramKey = paramName === 'pH' ? 'acidity' : paramName;
-				const paramAccuracy = accuracy[paramKey];
-
-				// Return array of strings for multi-line tooltip
-				return [
-				`${displayName} (Prediksi): ${value.toFixed(2)} ${unit}`,
-				`Akurasi: ${(100 - paramAccuracy).toFixed(1)}%`
-				];
-			}
-
-			return `${displayName}: ${value.toFixed(2)} ${unit}`;
-			}
-		}
-		},
+        tooltip: {
+          callbacks: createTooltipCallbacks(datasets, displayName, paramName, predictionHorizon)
+        },
         annotation: {
           annotations: {
             // Optimal range
@@ -716,11 +749,6 @@ const RecordChart: React.FC<RecordChartProps> = ({
                   <div className="w-3 h-3 rounded mr-1" style={{backgroundColor: '#8b5cf6'}}></div>
                   <span>Prediksi Terdahulu</span>
                 </div>
-
-                <div className="flex items-center">
-                  <div className="w-3 h-3 rounded-full mr-1 transform rotate-45" style={{backgroundColor: '#22c55e'}}></div>
-                  <span>Nilai Aktual</span>
-                </div>
               </>
             )}
           </div>
@@ -735,7 +763,6 @@ const RecordChart: React.FC<RecordChartProps> = ({
       </div>
     );
   }, [
-    // Dependencies for renderParameterChart
     temp, oxygen, salinity, pH,
     optimals, acceptable,
     predictionHorizon, viewMode,
@@ -792,9 +819,9 @@ const RecordChart: React.FC<RecordChartProps> = ({
         )}
       </div>
 
-      {/* Enhanced unified legend with comparison data visualization */}
+      {/* Enhanced unified legend */}
       <div className="bg-gray-50 p-3 rounded-lg mt-2">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full mr-1" style={{backgroundColor: colors.temperature.line}}></div>
             <div className="w-8 h-0 border-t-2 border-solid mr-2" style={{borderColor: colors.temperature.line}}></div>
@@ -815,14 +842,6 @@ const RecordChart: React.FC<RecordChartProps> = ({
               <span className="text-sm">Prediksi Terdahulu</span>
             </div>
           )}
-
-          {/* Actual values legend */}
-          {(viewMode === 'predictions' || viewMode === 'combined') && (
-            <div className="flex items-center">
-              <div className="w-3 h-3 transform rotate-45" style={{backgroundColor: '#22c55e'}}></div>
-              <span className="text-sm ml-2">Nilai Aktual</span>
-            </div>
-          )}
         </div>
 
         <div className="flex items-center mt-2">
@@ -837,7 +856,7 @@ const RecordChart: React.FC<RecordChartProps> = ({
         </div>
       </div>
 
-      {/* Enhanced explanation with comparison information */}
+      {/* Enhanced explanation */}
       <div className="mt-2 text-xs bg-blue-50 p-2 rounded">
         <div className="flex items-start">
           <InfoCircleOutlined className="mt-0.5 mr-1 text-blue-500" />
@@ -848,12 +867,11 @@ const RecordChart: React.FC<RecordChartProps> = ({
               <li>Data <strong>prediksi mendatang</strong> memperpanjang grafik ke masa depan (area biru)</li>
               {(viewMode === 'predictions' || viewMode === 'combined') && (
                 <>
-                  <li>Data <strong>prediksi terdahulu</strong> (persegi ungu) memungkinkan evaluasi akurasi model</li>
-                  <li>Data <strong>nilai aktual</strong> (segitiga hijau) menampilkan pengukuran yang sebenarnya terjadi</li>
+                  <li>Data <strong>prediksi terdahulu</strong> (persegi ungu) memungkinkan evaluasi riwayat model</li>
                 </>
               )}
               <li>Garis vertikal biru menandai batas antara data aktual dan prediksi</li>
-              <li>Hover pada titik untuk melihat nilai dan akurasi prediksi (jika tersedia)</li>
+              <li>Hover pada titik untuk melihat nilai parameter</li>
             </ul>
           </div>
         </div>
