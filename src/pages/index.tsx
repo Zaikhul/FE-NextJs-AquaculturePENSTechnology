@@ -5,7 +5,7 @@ import styles from "@/styles/Home.module.css";
 import MainLayout from "@/layouts/MainLayout";
 import HomeViews from "@/views/home/Home";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'], display: 'swap', adjustFontFallback: false})
 
 interface IHome {
 	informations: any;

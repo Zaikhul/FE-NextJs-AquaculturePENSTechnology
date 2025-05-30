@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Signin from "@/views/auth/signup/Signin";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'], display: 'swap', adjustFontFallback: false})
 
 export default function Auth() {
 	return (
